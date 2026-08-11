@@ -1,20 +1,22 @@
-import os
 import asyncio
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import os
 from threading import Thread
-from dotenv import load_dotenv
+
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Initialize Bot Client with required intents (and DM support)
+# Initialize Bot Client with required intents (including Presences for status display)
 intents = discord.Intents.default()
 intents.guilds = True
 intents.guild_messages = True
 intents.message_content = True
-intents.dm_messages = True  # Correct attribute for DM support
+intents.dm_messages = True
+intents.presences = True  # Required to broadcast presence/status properly
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -36,6 +38,18 @@ async def load_commands(directory: str):
 
 @bot.event
 async def on_ready():
+    # --- STREAMING PRESENCE ---
+    streaming_activity = discord.Streaming(
+        name="Nothing suspicious going on here :3",
+        state="don't click watch",
+        url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    )
+
+    await bot.change_presence(
+        status=discord.Status.online,
+        activity=streaming_activity,
+    )
+
     # Sync slash commands with Discord API upon startup
     try:
         synced = await bot.tree.sync()
@@ -43,11 +57,12 @@ async def on_ready():
     except Exception as e:
         print(f"Failed to sync slash commands: {e}")
 
-    print(f"Logged in as {bot.user} (Python Bot Live!)")
+    print(f"Logged in as {bot.user} (Python Bot Live & Streaming!)")
 
 
 # Keep-alive HTTP server for Render port check
 class KeepAliveHandler(BaseHTTPRequestHandler):
+
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
