@@ -6,7 +6,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-# Import your existing core Chess logic class
 from ..chess_game import Chess
 
 
@@ -68,6 +67,7 @@ class ChessButton(discord.ui.Button["ChessView"]):
     def __init__(self, *, cancel_button: bool = False):
         super().__init__(
             label="Cancel" if cancel_button else "Make your move!",
+            emoji="✖️" if cancel_button else "♟️",
             style=discord.ButtonStyle.red if cancel_button else discord.ButtonStyle.blurple,
         )
 
@@ -78,7 +78,7 @@ class ChessButton(discord.ui.Button["ChessView"]):
                 "you aren't part of this game!", ephemeral=True
             )
 
-        if self.label == "Cancel":
+        if self.emoji and self.emoji.name == "✖️":
             self.view.disable_all()
             await interaction.message.edit(view=self.view)
             await interaction.response.send_message("game cancelled.")
@@ -99,7 +99,7 @@ class ChessView(discord.ui.View):
         self.add_item(ChessButton())
         self.add_item(ChessButton(cancel_button=True))
 
-    def disable_all() -> None:
+    def disable_all(self) -> None:
         for child in self.children:
             if isinstance(child, discord.ui.Button):
                 child.disabled = True
