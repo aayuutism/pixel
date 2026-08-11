@@ -10,45 +10,51 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Initialize Bot Client with required intents (including Presences for status display)
+# Initialize Bot Client with required intents
 intents = discord.Intents.default()
 intents.guilds = True
 intents.guild_messages = True
 intents.message_content = True
 intents.dm_messages = True
-intents.presences = True  # Required to broadcast presence/status properly
+intents.presences = True  # Required to display status properly
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
-# Helper function to recursively load command files (Cogs) from subfolders
+# Helper function to recursively load command files (Cogs) safely
 async def load_commands(directory: str):
     for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".py") and not file.startswith("_"):
-                # Convert path to module format (e.g. cogs/utility/ship.py -> cogs.utility.ship)
                 rel_path = os.path.relpath(os.path.join(root, file), start=".")
                 module_name = rel_path[:-3].replace(os.sep, ".")
                 try:
                     await bot.load_extension(module_name)
                     print(f"Loaded extension: {module_name}")
+                except commands.ExtensionAlreadyLoaded:
+                    print(f"Skipped duplicate extension: {module_name}")
                 except Exception as e:
                     print(f"Failed to load extension {module_name}: {e}")
 
 
 @bot.event
 async def on_ready():
-    # --- STREAMING PRESENCE ---
-    streaming_activity = discord.Streaming(
-        name="Nothing suspicious going on here :3",
-        state="don't click watch",
-        url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    )
+    print(">>> ON_READY EVENT FIRED! <<<")
 
-    await bot.change_presence(
-        status=discord.Status.online,
-        activity=streaming_activity,
-    )
+    # --- STREAMING PRESENCE ---
+    try:
+        streaming_activity = discord.Streaming(
+            name="Nothing suspicious going on here :3",
+            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        )
+
+        await bot.change_presence(
+            status=discord.Status.online,
+            activity=streaming_activity,
+        )
+        print(">>> PRESENCE SET TO STREAMING <<<")
+    except Exception as e:
+        print(f"Failed to set presence: {e}")
 
     # Sync slash commands with Discord API upon startup
     try:
@@ -85,7 +91,6 @@ Thread(target=run_http_server, daemon=True).start()
 
 async def main():
     async with bot:
-        # Load commands from 'cogs' directory if it exists
         if os.path.exists("cogs"):
             await load_commands("cogs")
 
