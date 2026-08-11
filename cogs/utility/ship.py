@@ -124,19 +124,28 @@ class ShipCog(commands.Cog):
     @app_commands.command(
         name="ship", description="Calculate love compatibility between two users."
     )
-    @app_commands.describe(target="The user to ship with (optional)")
+    @app_commands.describe(
+        user1="First user to ship",
+        user2="Second user to ship (optional, defaults to you)",
+    )
     @app_commands.allowed_contexts(
         guilds=True, dms=True, private_channels=True
     )
     async def ship(
         self,
         interaction: discord.Interaction,
-        target: discord.User | None = None,
+        user1: discord.User,
+        user2: discord.User | None = None,
     ):
         await interaction.response.defer()
 
-        target1 = interaction.user
-        target2 = target or interaction.user
+        # Determine ship targets
+        if user2 is None:
+            target1 = interaction.user
+            target2 = user1
+        else:
+            target1 = user1
+            target2 = user2
 
         score = self.calculate_love(target1.id, target2.id)
 
@@ -156,4 +165,5 @@ class ShipCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(ShipCog(bot))
+    if not bot.get_cog("ShipCog"):
+        await bot.add_cog(ShipCog(bot))
