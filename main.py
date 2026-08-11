@@ -14,7 +14,7 @@ intents = discord.Intents.default()
 intents.guilds = True
 intents.guild_messages = True
 intents.message_content = True
-intents.direct_messages = True
+intents.dm_messages = True  # Correct attribute for DM support
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -24,7 +24,7 @@ async def load_commands(directory: str):
     for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".py") and not file.startswith("_"):
-                # Convert path to module format (e.g. commands/games/ship.py -> commands.games.ship)
+                # Convert path to module format (e.g. cogs/utility/ship.py -> cogs.utility.ship)
                 rel_path = os.path.relpath(os.path.join(root, file), start=".")
                 module_name = rel_path[:-3].replace(os.sep, ".")
                 try:
@@ -70,9 +70,9 @@ Thread(target=run_http_server, daemon=True).start()
 
 async def main():
     async with bot:
-        # Load commands from 'commands' directory if it exists
-        if os.path.exists("commands"):
-            await load_commands("commands")
+        # Load commands from 'cogs' directory if it exists
+        if os.path.exists("cogs"):
+            await load_commands("cogs")
 
         await bot.start(os.getenv("DISCORD_TOKEN"))
 
