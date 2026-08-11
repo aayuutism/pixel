@@ -3,11 +3,11 @@ from discord import app_commands
 from discord.ext import commands
 
 # --- CUSTOM EMOJIS & CONSTANTS ---
-CROSS = "<:cross:1533886171510210590>"
-ZERO = "<:zero:1533886158176649307>"
-TICK_MARK_ID = 1533886268512141393  # Raw ID for button emoji
-CELEBRATE = "<:celebrate:1533887935252795422>"
-TIMER = "<:timer:1533996398448480376>"
+P1= "<:ttt_x:1536802209189339146>"
+P2= "<:ttt_o:1536802206202724526>"
+TICK_MARK = 1533886268512141393 
+TADA = "<:tada:1536797799138721812>"
+TIMER = "<:timer:1536795548961480806>"
 
 
 # --- BOARD BUTTON ---
@@ -56,7 +56,7 @@ class TicTacToeButton(discord.ui.Button):
             if winner == "TIE":
                 final_status = "The game has ended in a tie!"
             else:
-                final_status = f"{CELEBRATE} {view.turn_player.mention} ({symbol}) won the game!"
+                final_status = f"{TADA} {view.turn_player.mention} ({symbol}) won the game!"
 
             return await interaction.response.edit_message(
                 content=f" **Tic-Tac-Toe Game Over!**\n\n{final_status}",
@@ -139,7 +139,7 @@ class TicTacToeInviteView(discord.ui.View):
         self.game_accepted = False
 
     @discord.ui.button(
-        emoji=discord.PartialEmoji(name="tick", id=TICK_MARK_ID),
+        emoji=discord.PartialEmoji(name="tick", id=TICK_MARK),
         style=discord.ButtonStyle.success,
     )
     async def accept(
