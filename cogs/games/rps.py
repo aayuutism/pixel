@@ -134,27 +134,8 @@ class RPSInviteView(discord.ui.View):
         if not self.opponent:
             self.opponent = interaction.user
 
+        await interaction.response.defer()
         self.stop()
-
-        game_view = RPSGameView(self.challenger, self.opponent)
-        await interaction.response.edit_message(
-            content=(
-                f"{self.challenger.mention} {self.opponent.mention}\n"
-                f"> ### Any of you can go first\n"
-                f"> Click a button to make your move"
-            ),
-            view=game_view,
-        )
-
-        # Wait for game completion or timeout
-        timed_out = await game_view.wait()
-        if timed_out and len(game_view.moves) < 2:
-            game_view.update_buttons(disabled=True)
-            await interaction.followup.edit_message(
-                message_id=interaction.message.id,
-                content="⏰ Rock-Paper-Scissors game timed out due to inactivity!",
-                view=game_view,
-            )
 
 
 # --- MAIN COG ---
@@ -201,17 +182,38 @@ class RPSCog(commands.Cog):
         )
         msg = await interaction.original_response()
 
-        # Wait for invitation or timeout
+        # Wait for invitation response or timeout
         timed_out = await invite_view.wait()
-        if timed_out and not invite_view.game_accepted:
+        if timed_out or not invite_view.game_accepted:
             invite_view.accept.disabled = True
             expired_text = (
                 f"⏰ **The game invitation has expired.**\n\n{opponent.mention} > Click the button to play Rock-Paper-Scissors with {challenger.mention}!"
                 if opponent
                 else f"⏰ **The game invitation has expired.**\n\n> Click the button to play Rock-Paper-Scissors with {challenger.mention}!"
             )
-            await interaction.followup.edit_message(
+            return await interaction.followup.edit_message(
                 message_id=msg.id, content=expired_text, view=invite_view
+            )
+
+        # Transition to game board in command scope
+        game_view = RPSGameView(challenger, invite_view.opponent)
+        await interaction.followup.edit_message(
+            message_id=msg.id,
+            content=(
+                f"{challenger.mention} {invite_view.opponent.mention}\n"
+                f"> ### Any of you can go first\n"
+                f"> Click a button to make your move"
+            ),
+            view=game_view,
+        )
+
+        game_timed_out = await game_view.wait()
+        if game_timed_out and len(game_view.moves) < 2:
+            game_view.update_buttons(disabled=True)
+            await interaction.followup.edit_message(
+                message_id=msg.id,
+                content="⏰ Rock-Paper-Scissors game timed out due to inactivity!",
+                view=game_view,
             )
 
 
