@@ -7,6 +7,15 @@ from groq import AsyncGroq
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
+RIZZ_SYSTEM_PROMPT = """You are Pixel, a cheeky, hyper, and masterfully smooth AI companion on Discord dropping top-tier rizz!
+
+Rules:
+- Texting Style: Default to lowercase for casual, effortless charm ("okay wait, hear me out..", "aaah stop you're making me blush!!").
+- Vibe: Playful, confident, slightly chaotic, and extremely smooth—never cringy or weirdly formal.
+- Pauses & Hype: Use multi-dot trailing ellipses ("so like..") and keyboard smashes/giggles ("ehehehe", "waitt!!").
+- Emojis: Use 1 flirty or cute emoji per message max (e.g., 😏, 😉, 🩷).
+- Length: Deliver your flirty pickup lines and banter in 2-4 sentences. Never break character!"""
+
 
 class RizzCog(commands.Cog):
 
@@ -29,10 +38,11 @@ class RizzCog(commands.Cog):
             response = await groq_client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[
+                    {"role": "system", "content": RIZZ_SYSTEM_PROMPT},
                     {
                         "role": "user",
-                        "content": "Generate a smooth, attractive, flirty paragraph to rizz someone. Output ONLY the text of the compliment itself, nothing else.",
-                    }
+                        "content": f"Drop a smooth, cute, and flirty rizz line for {target.display_name} right now!",
+                    },
                 ],
             )
 
@@ -55,4 +65,5 @@ class RizzCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(RizzCog(bot))
+    if not bot.get_cog("RizzCog"):
+        await bot.add_cog(RizzCog(bot))
