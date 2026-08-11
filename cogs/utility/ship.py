@@ -36,21 +36,24 @@ class ShipCog(commands.Cog):
         output.paste(img, (0, 0), mask)
         return output
 
-    def get_emoji_char(self, score: int) -> str:
-        """Determines the default emoji based on score bracket."""
+    def get_emoji_url(self, score: int) -> str:
+        """Fetches high-res Apple 3D emojis directly to avoid missing font issues on Linux."""
         if score >= 90:
-            return "🩷"
+            # Pink Heart 🩷
+            return "https://em-content.zobj.net/source/apple/354/pink-heart_1f977.png"
         elif score >= 50:
-            return "😍"
+            # Heart Eyes 😍
+            return "https://em-content.zobj.net/source/apple/354/smiling-face-with-heart-eyes_1f60d.png"
         elif score >= 20:
-            return "💔"
+            # Broken Heart 💔
+            return "https://em-content.zobj.net/source/apple/354/broken-heart_1f494.png"
         else:
-            return "☠️"
+            # Skull ☠️
+            return "https://em-content.zobj.net/source/apple/354/skull-and-crossbones_2620-fe0f.png"
 
     async def generate_ship_image(
         self, user1: discord.User, user2: discord.User, score: int
     ) -> io.BytesIO:
-        # Canvas matching dark embed container proportions
         width, height = 700, 360
         canvas = Image.new("RGBA", (width, height), (24, 25, 28, 255))
         draw = ImageDraw.Draw(canvas)
@@ -62,62 +65,48 @@ class ShipCog(commands.Cog):
             avatar2_img = await self.fetch_image(
                 session, user2.display_avatar.with_format("png").url
             )
+            emoji_img = await self.fetch_image(session, self.get_emoji_url(score))
 
+        # Size and position avatars and middle emoji
         avatar_size = 170
+        emoji_size = 140
+
         circ1 = self.make_circle(avatar1_img, avatar_size)
         circ2 = self.make_circle(avatar2_img, avatar_size)
+        emoji_resized = emoji_img.resize((emoji_size, emoji_size), Image.Resampling.LANCZOS)
 
-        # Place left and right avatars
         canvas.paste(circ1, (75, 55), circ1)
+        canvas.paste(emoji_resized, (280, 70), emoji_resized)
         canvas.paste(circ2, (455, 55), circ2)
 
-        # Render middle default emoji text
-        emoji_char = self.get_emoji_char(score)
-        try:
-            # seguiemj = Windows Emoji Font, Apple Color Emoji = macOS font
-            font_emoji = ImageFont.truetype("seguiemj.ttf", 100)
-        except OSError:
-            try:
-                font_emoji = ImageFont.truetype(
-                    "/System/Library/Fonts/Apple Color Emoji.ttc", 100
-                )
-            except OSError:
-                font_emoji = ImageFont.load_default()
-
-        draw.text(
-            (350, 140),
-            emoji_char,
-            fill=(255, 255, 255, 255),
-            anchor="mm",
-            font=font_emoji,
-            embedded_color=True,
-        )
-
-        # Exact Progress Bar Layout
+        # Progress Bar Layout
         bar_x, bar_y = 110, 265
-        bar_w, bar_h = 480, 42
+        bar_w, bar_h = 480, 48
 
-        # Unfilled dark grey background (#707070)
+        # Dark grey background bar
         draw.rounded_rectangle(
             [bar_x, bar_y, bar_x + bar_w, bar_y + bar_h],
-            radius=4,
+            radius=6,
             fill=(112, 112, 112, 255),
         )
 
-        # Filled light lavender-blue progress bar (#D3D8FD)
+        # Light lavender-blue progress bar
         fill_w = int(bar_w * (score / 100))
         if fill_w > 0:
             draw.rounded_rectangle(
                 [bar_x, bar_y, bar_x + fill_w, bar_y + bar_h],
-                radius=4,
+                radius=6,
                 fill=(211, 216, 253, 255),
             )
 
-        # Overlay percentage text inside progress bar
+        # Bigger & Bolder Text
         try:
-            font_text = ImageFont.truetype("arial.ttf", 22)
+            font_text = ImageFont.truetype("DejaVuSans-Bold.ttf", 28)
         except OSError:
-            font_text = ImageFont.load_default()
+            try:
+                font_text = ImageFont.truetype("arial.ttf", 28)
+            except OSError:
+                font_text = ImageFont.load_default()
 
         draw.text(
             (bar_x + bar_w // 2, bar_y + bar_h // 2 - 1),
@@ -151,7 +140,6 @@ class ShipCog(commands.Cog):
 
         score = self.calculate_love(target1.id, target2.id)
 
-        # Combine names into ship title
         name1 = target1.display_name
         name2 = target2.display_name
         ship_name = f"{name1[:len(name1)//2]}{name2[len(name2)//2:]} 💕"
