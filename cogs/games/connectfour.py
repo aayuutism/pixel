@@ -8,8 +8,11 @@ PLAYER0 = "<:p0:1536795551213949089>"
 PLAYER1 = "<:p1:1536795556280795236>"
 PLAYER2 = "<:p2:1536795603990741062>"
 TICK_MARK = discord.PartialEmoji.from_str("<:check:1533886268512141393>")
-TADA= "<:tada:1536797799138721812>"
+TADA = "<:tada:1536797799138721812>"
 TIMER = "<:timer:1536795548961480806>"
+
+# Default numeric emojis
+NUMBERS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"]
 
 
 # --- BOARD VIEW (STAGE 2) ---
@@ -24,7 +27,7 @@ class ConnectFourBoardView(discord.ui.View):
         self.ROWS = 6
         self.COLS = 7
         self.board = [
-            [PLAYER0for _ in range(self.COLS)] for _ in range(self.ROWS)
+            [PLAYER0 for _ in range(self.COLS)] for _ in range(self.ROWS)
         ]
         self.player_symbols = {
             challenger.id: PLAYER1,
@@ -41,7 +44,7 @@ class ConnectFourBoardView(discord.ui.View):
     def update_buttons(self, disabled: bool = False):
         self.clear_items()
         for col in range(self.COLS):
-            col_full = self.board[0][col] != EMOJI_EMPTY
+            col_full = self.board[0][col] != PLAYER0
             button = discord.ui.Button(
                 label=str(col + 1),
                 style=discord.ButtonStyle.primary,
@@ -65,7 +68,7 @@ class ConnectFourBoardView(discord.ui.View):
 
             # Drop piece
             for r in range(self.ROWS - 1, -1, -1):
-                if self.board[r][col_index] == EMOJI_EMPTY:
+                if self.board[r][col_index] == PLAYER0:
                     self.board[r][col_index] = current_symbol
                     break
 
@@ -74,7 +77,7 @@ class ConnectFourBoardView(discord.ui.View):
                 self.update_buttons(disabled=True)
                 self.stop()
                 return await interaction.response.edit_message(
-                    content=f"{CELEBRATE} {self.turn_player.mention} ({current_symbol}) won Connect Four!\n\n{self.render_board()}",
+                    content=f"{TADA} {self.turn_player.mention} ({current_symbol}) won Connect Four!\n\n{self.render_board()}",
                     view=self,
                 )
 
@@ -147,7 +150,7 @@ class ConnectFourBoardView(discord.ui.View):
         return False
 
     def is_board_full(self) -> bool:
-        return all(cell != PLAYER0for cell in self.board[0])
+        return all(cell != PLAYER0 for cell in self.board[0])
 
     async def on_timeout(self):
         self.update_buttons(disabled=True)
@@ -183,23 +186,8 @@ class ConnectFourInviteView(discord.ui.View):
         if not self.opponent:
             self.opponent = interaction.user
 
+        await interaction.response.defer()
         self.stop()
-
-        # Switch to Board View
-        board_view = ConnectFourBoardView(self.challenger, self.opponent)
-        await interaction.response.edit_message(
-            content=f"{PLAYER1} **Connect Four**: {self.challenger.mention} ({PLAYER1}) vs {self.opponent.mention} ({PLAYER2})\n\n{board_view.render_board()}\n\n{PLAYER1} {self.challenger.mention}, it's your turn!",
-            view=board_view,
-        )
-
-        # Wait for game to finish/timeout
-        timeout = await board_view.wait()
-        if timeout:
-            await interaction.followup.edit_message(
-                message_id=interaction.message.id,
-                content=f"{TIMER} The game timed out due to inactivity!\n\n{board_view.render_board()}",
-                view=board_view,
-            )
 
 
 # --- MAIN COG ---
@@ -248,15 +236,32 @@ class ConnectFourCog(commands.Cog):
 
         # Wait for invitation response or timeout
         timed_out = await invite_view.wait()
-        if timed_out and not invite_view.game_accepted:
+        if timed_out or not invite_view.game_accepted:
             invite_view.accept.disabled = True
             expired_text = (
                 f"{TIMER} **The game invitation has expired.**\n\n{opponent.mention} > Click the button to play Connect Four with {challenger.mention}!"
                 if opponent
                 else f"{TIMER} **The game invitation has expired.**\n\n> Click the button to play Connect Four with {challenger.mention}!"
             )
-            await interaction.followup.edit_message(
+            return await interaction.followup.edit_message(
                 message_id=msg.id, content=expired_text, view=invite_view
+            )
+
+        # Start game flow
+        board_view = ConnectFourBoardView(challenger, invite_view.opponent)
+        await interaction.followup.edit_message(
+            message_id=msg.id,
+            content=f"{PLAYER1} **Connect Four**: {challenger.mention} ({PLAYER1}) vs {invite_view.opponent.mention} ({PLAYER2})\n\n{board_view.render_board()}\n\n{PLAYER1} {challenger.mention}, it's your turn!",
+            view=board_view,
+        )
+
+        game_timed_out = await board_view.wait()
+        if game_timed_out:
+            board_view.update_buttons(disabled=True)
+            await interaction.followup.edit_message(
+                message_id=msg.id,
+                content=f"{TIMER} The game timed out due to inactivity!\n\n{board_view.render_board()}",
+                view=board_view,
             )
 
 
