@@ -6,7 +6,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-# Import your existing core CountryGuesser logic class
 from ..country_guess import CountryGuesser
 
 
@@ -81,11 +80,11 @@ class CountryView(discord.ui.View):
             return False
         return True
 
-    @discord.ui.button(label="Make a guess!", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Make a guess!", emoji="🌍", style=discord.ButtonStyle.blurple)
     async def guess_button(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         return await interaction.response.send_modal(CountryInput(self))
 
-    @discord.ui.button(label="Hint", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Hint", emoji="💡", style=discord.ButtonStyle.green)
     async def hint_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
@@ -99,7 +98,7 @@ class CountryView(discord.ui.View):
             button.disabled = True
             await interaction.message.edit(view=self)
 
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Cancel", emoji="✖️", style=discord.ButtonStyle.red)
     async def cancel_button(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         self.disable_all()
 
