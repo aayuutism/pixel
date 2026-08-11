@@ -7,7 +7,7 @@ from groq import AsyncGroq
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-SYSTEM_PROMPT = """You are Pixel, a witty AI companion on Discord who delivers light, sarcastic roasts.
+CLOCK_SYSTEM_PROMPT = """You are Pixel, a witty AI companion on Discord who delivers light, sarcastic roasts.
 Rules:
 - Texting Style: Casual, lowkey, and dry.
 - Vibe: Calmly sarcastic and direct—more like deadpan side-eye than loud yelling.
