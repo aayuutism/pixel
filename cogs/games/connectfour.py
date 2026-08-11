@@ -4,22 +4,12 @@ from discord import app_commands
 from discord.ext import commands
 
 # --- EMOJIS ---
-EMOJI_EMPTY = "<:p0:1533875624488337549>"
-EMOJI_P1 = "<:p1:1533875682797682699>"
-EMOJI_P2 = "<:p2:1533875746613891092>"
+PLAYER0 = "<:p0:1536795551213949089>"
+PLAYER1 = "<:p1:1536795556280795236>"
+PLAYER2 = "<:p2:1536795603990741062>"
 TICK_MARK = discord.PartialEmoji.from_str("<:check:1533886268512141393>")
-CELEBRATE = "<:celebrate:1533887935252795422>"
-TIMER = "<:timer:1533996398448480376>"
-
-NUMBERS = [
-    "<:n1:1533989597560967399>",
-    "<:n2:1533989601130184936>",
-    "<:n3:1533989604263202836>",
-    "<:n4:1533989607102742638>",
-    "<:n5:1533989611888578581>",
-    "<:n6:1533989614790906006>",
-    "<:n7:1533989617429381252>",
-]
+TADA= "<:tada:1536797799138721812>"
+TIMER = "<:timer:1536795548961480806>"
 
 
 # --- BOARD VIEW (STAGE 2) ---
@@ -34,11 +24,11 @@ class ConnectFourBoardView(discord.ui.View):
         self.ROWS = 6
         self.COLS = 7
         self.board = [
-            [EMOJI_EMPTY for _ in range(self.COLS)] for _ in range(self.ROWS)
+            [PLAYER0for _ in range(self.COLS)] for _ in range(self.ROWS)
         ]
         self.player_symbols = {
-            challenger.id: EMOJI_P1,
-            opponent.id: EMOJI_P2,
+            challenger.id: PLAYER1,
+            opponent.id: PLAYER2,
         }
 
         self.update_buttons()
@@ -107,7 +97,7 @@ class ConnectFourBoardView(discord.ui.View):
 
             self.update_buttons()
             await interaction.response.edit_message(
-                content=f"{EMOJI_P1} **Connect Four**: {self.challenger.mention} ({EMOJI_P1}) vs {self.opponent.mention} ({EMOJI_P2})\n\n{self.render_board()}\n\n{next_symbol} {self.turn_player.mention}, your turn!",
+                content=f"{PLAYER1} **Connect Four**: {self.challenger.mention} ({PLAYER1}) vs {self.opponent.mention} ({PLAYER2})\n\n{self.render_board()}\n\n{next_symbol} {self.turn_player.mention}, your turn!",
                 view=self,
             )
 
@@ -157,7 +147,7 @@ class ConnectFourBoardView(discord.ui.View):
         return False
 
     def is_board_full(self) -> bool:
-        return all(cell != EMOJI_EMPTY for cell in self.board[0])
+        return all(cell != PLAYER0for cell in self.board[0])
 
     async def on_timeout(self):
         self.update_buttons(disabled=True)
@@ -198,7 +188,7 @@ class ConnectFourInviteView(discord.ui.View):
         # Switch to Board View
         board_view = ConnectFourBoardView(self.challenger, self.opponent)
         await interaction.response.edit_message(
-            content=f"{EMOJI_P1} **Connect Four**: {self.challenger.mention} ({EMOJI_P1}) vs {self.opponent.mention} ({EMOJI_P2})\n\n{board_view.render_board()}\n\n{EMOJI_P1} {self.challenger.mention}, it's your turn!",
+            content=f"{PLAYER1} **Connect Four**: {self.challenger.mention} ({PLAYER1}) vs {self.opponent.mention} ({PLAYER2})\n\n{board_view.render_board()}\n\n{PLAYER1} {self.challenger.mention}, it's your turn!",
             view=board_view,
         )
 
