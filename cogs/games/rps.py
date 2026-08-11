@@ -77,8 +77,7 @@ class RPSGameView(discord.ui.View):
 
                 if move1 == move2:
                     result_text = (
-                        f"> ### It's a tie!\n"
-                        f"> Both chose {EMOJI_MAP[move1]}"
+                        f"> ### It's a tie!\n> Both chose {EMOJI_MAP[move1]}"
                     )
                 elif (
                     (move1 == "rock" and move2 == "scissors")
@@ -147,7 +146,9 @@ class RPSCog(commands.Cog):
     @app_commands.command(
         name="rps", description="Play Rock-Paper-Scissors with a friend"
     )
-    @app_commands.describe(player="The user you want to play against (optional)")
+    @app_commands.describe(
+        player="The user you want to play against (optional)"
+    )
     @app_commands.allowed_contexts(
         guilds=True, dms=True, private_channels=True
     )
@@ -218,4 +219,6 @@ class RPSCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(RPSCog(bot))
+    # Safely prevent throwing ClientException if already loaded
+    if not bot.get_cog("RPSCog"):
+        await bot.add_cog(RPSCog(bot))
