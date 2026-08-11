@@ -3,8 +3,8 @@ from discord import app_commands
 from discord.ext import commands
 
 # --- CUSTOM EMOJIS & CONSTANTS ---
-P1= "<:ttt_x:1536802209189339146>"
-P2= "<:ttt_o:1536802206202724526>"
+P1 = "<:ttt_x:1536802209189339146>"
+P2 = "<:ttt_o:1536802206202724526>"
 TICK_MARK = 1533886268512141393 
 TADA = "<:tada:1536797799138721812>"
 TIMER = "<:timer:1536795548961480806>"
@@ -70,12 +70,12 @@ class TicTacToeButton(discord.ui.Button):
             else view.challenger
         )
         next_symbol = (
-            CROSS if view.turn_player.id == view.challenger.id else ZERO
+            P1 if view.turn_player.id == view.challenger.id else P2
         )
 
         await interaction.response.edit_message(
             content=(
-                f"**{view.challenger.display_name}** ({CROSS}) vs **{view.opponent.display_name}** ({ZERO})\n\n"
+                f"**{view.challenger.display_name}** ({P1}) vs **{view.opponent.display_name}** ({P2})\n\n"
                 f"{next_symbol} {view.turn_player.mention}, your turn!"
             ),
             view=view,
@@ -160,26 +160,8 @@ class TicTacToeInviteView(discord.ui.View):
         if not self.opponent:
             self.opponent = interaction.user
 
+        await interaction.response.defer()
         self.stop()
-
-        board_view = TicTacToeBoardView(self.challenger, self.opponent)
-        await interaction.response.edit_message(
-            content=(
-                f" **Tic-Tac-Toe**: {self.challenger.mention} ({CROSS}) vs {self.opponent.mention} ({ZERO})\n\n"
-                f"{CROSS} {self.challenger.mention}, it's your turn!"
-            ),
-            view=board_view,
-        )
-
-        # Wait for the game to complete or time out
-        timed_out = await board_view.wait()
-        if timed_out:
-            board_view.disable_all_buttons()
-            await interaction.followup.edit_message(
-                message_id=interaction.message.id,
-                content=f"{TIMER} Tic-Tac-Toe game timed out due to inactivity!",
-                view=board_view,
-            )
 
 
 # --- MAIN COG ---
@@ -227,15 +209,35 @@ class TicTacToeCog(commands.Cog):
 
         # Wait for invitation response or timeout
         timed_out = await invite_view.wait()
-        if timed_out and not invite_view.game_accepted:
+        if timed_out or not invite_view.game_accepted:
             invite_view.accept.disabled = True
             expired_text = (
                 f"{TIMER} **The game invitation has expired.**\n\n{opponent.mention} > Click the button to play Tic-Tac-Toe with {challenger.mention}!"
                 if opponent
                 else f"{TIMER} **The game invitation has expired.**\n\n> Click the button to play Tic-Tac-Toe with {challenger.mention}!"
             )
-            await interaction.followup.edit_message(
+            return await interaction.followup.edit_message(
                 message_id=msg.id, content=expired_text, view=invite_view
+            )
+
+        # Transition game board inside the command loop
+        board_view = TicTacToeBoardView(challenger, invite_view.opponent)
+        await interaction.followup.edit_message(
+            message_id=msg.id,
+            content=(
+                f" **Tic-Tac-Toe**: {challenger.mention} ({P1}) vs {invite_view.opponent.mention} ({P2})\n\n"
+                f"{P1} {challenger.mention}, it's your turn!"
+            ),
+            view=board_view,
+        )
+
+        game_timed_out = await board_view.wait()
+        if game_timed_out:
+            board_view.disable_all_buttons()
+            await interaction.followup.edit_message(
+                message_id=msg.id,
+                content=f"{TIMER} Tic-Tac-Toe game timed out due to inactivity!",
+                view=board_view,
             )
 
 
