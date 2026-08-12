@@ -1,3 +1,5 @@
+# cogs/games/flags.py
+
 """
 Database of country flags with Apple CDN image URLs and accepted lowercase text answers.
 Alphabetical order: starting with 'A'.
@@ -49,8 +51,8 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         "https://em-content.zobj.net/source/apple/354/flag-azerbaijan_1f1e6-1f1f8.png",
         ["azerbaijan", "az"],
     ),
-  
-# --- B ---
+
+    # --- B ---
     "Bahamas": (
         "https://em-content.zobj.net/source/apple/354/flag-bahamas_1f1e7-1f1f8.png",
         ["bahamas", "the bahamas", "bs"],
@@ -120,7 +122,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["burundi", "bi"],
     ),
 
-  # --- C ---
+    # --- C ---
     "Cabo Verde": (
         "https://em-content.zobj.net/source/apple/354/flag-cape-verde_1f1e8-1f1f2.png",
         ["cabo verde", "cape verde", "cv"],
@@ -186,7 +188,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["czech republic", "czechia", "cz"],
     ),
 
-  # --- D ---
+    # --- D ---
     "Denmark": (
         "https://em-content.zobj.net/source/apple/354/flag-denmark_1f1e9-1f1f0.png",
         ["denmark", "dk"],
@@ -204,7 +206,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["dominican republic", "dr", "do"],
     ),
 
-  # --- E ---
+    # --- E ---
     "Ecuador": (
         "https://em-content.zobj.net/source/apple/354/flag-ecuador_1f1ea-1f1e8.png",
         ["ecuador", "ec"],
@@ -238,7 +240,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["ethiopia", "et"],
     ),
 
-  # --- F ---
+    # --- F ---
     "Fiji": (
         "https://em-content.zobj.net/source/apple/354/flag-fiji_1f1eb-1f1ef.png",
         ["fiji", "fj"],
@@ -252,7 +254,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["france", "fr"],
     ),
 
-  # --- G ---
+    # --- G ---
     "Gabon": (
         "https://em-content.zobj.net/source/apple/354/flag-gabon_1f1ec-1f1e6.png",
         ["gabon", "ga"],
@@ -298,7 +300,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["guyana", "gy"],
     ),
 
-  # --- H ---
+    # --- H ---
     "Haiti": (
         "https://em-content.zobj.net/source/apple/354/flag-haiti_1f1ed-1f1f9.png",
         ["haiti", "ht"],
@@ -312,7 +314,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["hungary", "hu"],
     ),
 
-  # --- I ---
+    # --- I ---
     "Iceland": (
         "https://em-content.zobj.net/source/apple/354/flag-iceland_1f1ee-1f1f8.png",
         ["iceland", "is"],
@@ -350,7 +352,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["ivory coast", "cote divoire", "côte d'ivoire", "ci"],
     ),
 
-  # --- J ---
+    # --- J ---
     "Jamaica": (
         "https://em-content.zobj.net/source/apple/354/flag-jamaica_1f1ef-1f1f2.png",
         ["jamaica", "jm"],
@@ -364,7 +366,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["jordan", "jo"],
     ),
 
-  # --- K ---
+    # --- K ---
     "Kazakhstan": (
         "https://em-content.zobj.net/source/apple/354/flag-kazakhstan_1f1f0-1f1f8.png",
         ["kazakhstan", "kz"],
@@ -386,7 +388,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["kyrgyzstan", "kg"],
     ),
 
-  # --- L ---
+    # --- L ---
     "Laos": (
         "https://em-content.zobj.net/source/apple/354/flag-laos_1f1f1-1f1e6.png",
         ["laos", "lao", "la"],
@@ -424,7 +426,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["luxembourg", "lu"],
     ),
 
-  # --- M ---
+    # --- M ---
     "Madagascar": (
         "https://em-content.zobj.net/source/apple/354/flag-madagascar_1f1f2-1f1ec.png",
         ["madagascar", "mg"],
@@ -498,7 +500,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["myanmar", "burma", "mm"],
     ),
 
-  # --- N ---
+    # --- N ---
     "Namibia": (
         "https://em-content.zobj.net/source/apple/354/flag-namibia_1f1f3-1f1e6.png",
         ["namibia", "na"],
@@ -544,13 +546,13 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["norway", "no"],
     ),
 
-  # --- O ---
+    # --- O ---
     "Oman": (
         "https://em-content.zobj.net/source/apple/354/flag-oman_1f1f4-1f1f2.png",
         ["oman", "om"],
     ),
 
-  # --- P ---
+    # --- P ---
     "Pakistan": (
         "https://em-content.zobj.net/source/apple/354/flag-pakistan_1f1f5-1f1f0.png",
         ["pakistan", "pk"],
@@ -592,13 +594,13 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["portugal", "pt"],
     ),
 
-  # --- Q ---
+    # --- Q ---
     "Qatar": (
         "https://em-content.zobj.net/source/apple/354/flag-qatar_1f1f6-1f1e6.png",
         ["qatar", "qa"],
     ),
 
-  # --- R ---
+    # --- R ---
     "Romania": (
         "https://em-content.zobj.net/source/apple/354/flag-romania_1f1f7-1f1f4.png",
         ["romania", "ro"],
@@ -612,7 +614,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["rwanda", "rw"],
     ),
 
-  # --- S ---
+    # --- S ---
     "Saint Kitts and Nevis": (
         "https://em-content.zobj.net/source/apple/354/flag-st-kitts-nevis_1f1f0-1f1f3.png",
         ["saint kitts and nevis", "st kitts and nevis", "st kitts", "nevis", "kn"],
@@ -717,7 +719,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         "https://em-content.zobj.net/source/apple/354/flag-syria_1f1f8-1f1fe.png",
         ["syria", "sy"],
     ),
-    
+
     # --- T ---
     "Taiwan": (
         "https://em-content.zobj.net/source/apple/354/flag-taiwan_1f1f9-1f1fc.png",
@@ -768,7 +770,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["tuvalu", "tv"],
     ),
 
-  # --- U ---
+    # --- U ---
     "Uganda": (
         "https://em-content.zobj.net/source/apple/354/flag-uganda_1f1fa-1f1ec.png",
         ["uganda", "ug"],
@@ -798,7 +800,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["uzbekistan", "uz"],
     ),
 
-  # --- V ---
+    # --- V ---
     "Vanuatu": (
         "https://em-content.zobj.net/source/apple/354/flag-vanuatu_1f1fb-1f1fa.png",
         ["vanuatu", "vu"],
@@ -816,22 +818,22 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["vietnam", "vn"],
     ),
 
-  # --- W ---
+    # --- W ---
     "Wales": (
         "https://em-content.zobj.net/source/apple/354/flag-wales_1f3f4-e0067-e0062-e0077-e006c-e0073-e007f.png",
         ["wales", "wa"],
     ),
 
-  # --- X ---
+    # --- X ---
     # No sovereign nations starting with X
 
-  # --- Y ---
+    # --- Y ---
     "Yemen": (
         "https://em-content.zobj.net/source/apple/354/flag-yemen_1f1fe-1f1ea.png",
         ["yemen", "ye"],
     ),
 
-  # --- Z ---
+    # --- Z ---
     "Zambia": (
         "https://em-content.zobj.net/source/apple/354/flag-zambia_1f1f0-1f1f2.png",
         ["zambia", "zm"],
@@ -840,3 +842,4 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         "https://em-content.zobj.net/source/apple/354/flag-zimbabwe_1f1f0-1f1fc.png",
         ["zimbabwe", "zw"],
     ),
+}
