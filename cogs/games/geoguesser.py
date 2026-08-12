@@ -11,10 +11,10 @@ class StopGameView(discord.ui.View):
         self.author_id = author_id
         self.stopped = False
 
-    @discord.ui.button(label="Stop Game", style=discord.ButtonStyle.danger, emoji="🛑")
-    async def stop_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+@discord.ui.button(label="End Game", style=discord.ButtonStyle.secondary)
+async def stop_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author_id:
-            return await interaction.response.send_message("This isn't your game session!", ephemeral=True)
+            return await interaction.response.send_message("This isn't your game, silly!", ephemeral=True)
         
         self.stopped = True
         self.stop()
@@ -25,7 +25,7 @@ class FlagGame(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="geoguesser", description="Guess flags continuously until you make 5 mistakes or stop!")
+    @app_commands.command(name="geoguesser", description="Guess the countries by their flags!")
     async def flag_guesser(self, interaction: discord.Interaction):
         score = 0
         wrong_attempts = 0
@@ -43,7 +43,7 @@ class FlagGame(commands.Cog):
             embed = discord.Embed(
                 title=f"Guess the Flag! | Score: {score} | Strikes: {wrong_attempts}/{max_wrong}",
                 description="Type your answer in this channel within 30 seconds!\nClick **Stop Game** below anytime to exit.",
-                color=discord.Color.blue()
+                color = discord.Color(0x8BB96E)
             )
             embed.set_image(url=image_url)
 
@@ -60,7 +60,7 @@ class FlagGame(commands.Cog):
                 msg = await self.bot.wait_for("message", check=check, timeout=30.0)
                 
                 if view.stopped:
-                    await interaction.followup.send(f"🛑 Game ended by **{interaction.user.display_name}**! Final Score: **{score}**.")
+                    await interaction.followup.send(f"Game ended by **{interaction.user.display_name}**!\n Final Score: **{score}**.")
                     break
 
                 guess = msg.content.strip().lower()
@@ -68,18 +68,18 @@ class FlagGame(commands.Cog):
                 if guess in valid_answers:
                     score += 1
                     await interaction.followup.send(
-                        f"🎉 Correct, {msg.author.mention}! It was **{country}**! (+1 Point)"
+                        f"Bingo, you were right! It was **{country}**!"
                     )
                 else:
                     wrong_attempts += 1
                     remaining = max_wrong - wrong_attempts
                     if wrong_attempts < max_wrong:
                         await interaction.followup.send(
-                            f"❌ Wrong! The correct answer was **{country}**. ({remaining} {'strikes' if remaining > 1 else 'strike'} remaining)"
+                            f"Awh! The correct answer was **{country}**. ({remaining} {'strikes' if remaining > 1 else 'strike'} remaining)"
                         )
                     else:
                         await interaction.followup.send(
-                            f"❌ Wrong! The correct answer was **{country}**.\n💀 **Game Over!** You reached 5 wrong guesses. Final Score: **{score}**."
+                         f"Wrong! The correct answer was **{country}**.\n\n # > **Game Over!**\n You've maxed out your strikes. Final Score: **{score}**."
                         )
                         game_active = False
 
@@ -87,17 +87,17 @@ class FlagGame(commands.Cog):
 
             except asyncio.TimeoutError:
                 if view.stopped:
-                    await interaction.followup.send(f"🛑 Game ended by **{interaction.user.display_name}**! Final Score: **{score}**.")
+                    await interaction.followup.send(f"That's it for now! Your final score is **{score}**.")
                 else:
                     wrong_attempts += 1
                     remaining = max_wrong - wrong_attempts
                     if wrong_attempts < max_wrong:
                         await interaction.followup.send(
-                            f"⏰ Time's up! The correct answer was **{country}**. ({remaining} {'strikes' if remaining > 1 else 'strike'} remaining)"
+                            f"Time's up! The correct answer was **{country}**. ({remaining} {'strikes' if remaining > 1 else 'strike'} remaining)"
                         )
                     else:
                         await interaction.followup.send(
-                            f"⏰ Time's up! The correct answer was **{country}**.\n💀 **Game Over!** You reached 5 strikes. Final Score: **{score}**."
+                        f"Time's up! The correct answer was **{country}**.\n\n # > **Game Over!**\n You've maxed out your strikes. Final Score: **{score}**."
                         )
                         game_active = False
                 
