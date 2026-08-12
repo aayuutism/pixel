@@ -11,7 +11,12 @@ from .flags import FLAGS
 
 
 class CountryGuesser:
-    def __init__(self, bot: commands.Bot, user: discord.User, channel: discord.TextChannel):
+    def __init__(
+        self,
+        bot: commands.Bot,
+        user: discord.User | discord.Member,
+        channel: discord.TextChannel | discord.DMChannel | discord.GroupChannel | discord.Thread,
+    ):
         self.bot = bot
         self.user = user
         self.channel = channel
@@ -90,9 +95,21 @@ class CountryGuesserCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="guess", description="Play infinite flag guesser until you get one wrong!")
+    @app_commands.command(
+        name="countryguesser",
+        description="Play infinite flag guesser until you get one wrong!",
+    )
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def guess(self, interaction: discord.Interaction):
+    async def countryguesser(self, interaction: discord.Interaction):
+        if not interaction.channel or not isinstance(
+            interaction.channel,
+            (discord.TextChannel, discord.DMChannel, discord.GroupChannel, discord.Thread),
+        ):
+            await interaction.response.send_message(
+                "Unable to start the game in this channel context.", ephemeral=True
+            )
+            return
+
         game = CountryGuesser(self.bot, interaction.user, interaction.channel)
         await game.run(interaction)
 
