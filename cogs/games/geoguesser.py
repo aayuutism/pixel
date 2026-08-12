@@ -7,7 +7,7 @@ from cogs.games.flags import FLAGS
 
 class StopGameView(discord.ui.View):
     def __init__(self, author_id: int):
-        super().__init__(timeout=30.0) # Match the question timeout
+        super().__init__(timeout=30.0)
         self.author_id = author_id
         self.stopped = False
 
@@ -25,20 +25,23 @@ class FlagGame(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="geoguesser", description="Guess flags continuously until you miss or stop!")
+    @app_commands.command(name="geoguesser", description="Guess flags continuously until you make 5 mistakes or stop!")
     async def flag_guesser(self, interaction: discord.Interaction):
         score = 0
+        wrong_attempts = 0
+        max_wrong = 5
         game_active = True
         
         await interaction.response.defer()
 
-        while game_active:
+        while game_active and wrong_attempts < max_wrong:
             country, (image_url, valid_answers) = random.choice(list(FLAGS.items()))
 
             view = StopGameView(author_id=interaction.user.id)
 
+            # Display score and remaining lives in the embed
             embed = discord.Embed(
-                title=f"Guess the Flag! (Score: {score})",
+                title=f"Guess the Flag! | Score: {score} | Strikes: {wrong_attempts}/{max_wrong}",
                 description="Type your answer in this channel within 30 seconds!\nClick **Stop Game** below anytime to exit.",
                 color=discord.Color.blue()
             )
@@ -46,37 +49,59 @@ class FlagGame(commands.Cog):
 
             await interaction.followup.send(embed=embed, view=view)
 
+            # Accept any text response from the game host to process right/wrong guesses
             def check(m: discord.Message):
                 return (
                     m.channel.id == interaction.channel_id
-                    and not m.author.bot
-                    and m.content.strip().lower() in valid_answers
+                    and m.author.id == interaction.user.id
                 )
 
             try:
-                # Wait for the user's message answer
-                winner = await self.bot.wait_for("message", check=check, timeout=30.0)
+                msg = await self.bot.wait_for("message", check=check, timeout=30.0)
                 
-                # Check if the player clicked Stop before/during answering
                 if view.stopped:
                     await interaction.followup.send(f"🛑 Game ended by **{interaction.user.display_name}**! Final Score: **{score}**.")
                     break
 
-                score += 1
-                await interaction.followup.send(
-                    f"🎉 Correct, {winner.author.mention}! It was **{country}**! (+1 Point)"
-                )
+                guess = msg.content.strip().lower()
+
+                if guess in valid_answers:
+                    score += 1
+                    await interaction.followup.send(
+                        f"🎉 Correct, {msg.author.mention}! It was **{country}**! (+1 Point)"
+                    )
+                else:
+                    wrong_attempts += 1
+                    remaining = max_wrong - wrong_attempts
+                    if wrong_attempts < max_wrong:
+                        await interaction.followup.send(
+                            f"❌ Wrong! The correct answer was **{country}**. ({remaining} {'strikes' if remaining > 1 else 'strike'} remaining)"
+                        )
+                    else:
+                        await interaction.followup.send(
+                            f"❌ Wrong! The correct answer was **{country}**.\n💀 **Game Over!** You reached 5 wrong guesses. Final Score: **{score}**."
+                        )
+                        game_active = False
+
                 await asyncio.sleep(2)
 
             except asyncio.TimeoutError:
-                # Handle stop button vs actual time expiration
                 if view.stopped:
                     await interaction.followup.send(f"🛑 Game ended by **{interaction.user.display_name}**! Final Score: **{score}**.")
                 else:
-                    await interaction.followup.send(
-                        f"⏰ Time's up! The correct answer was **{country}**.\nGame Over! Final Score: **{score}**."
-                    )
-                game_active = False
+                    wrong_attempts += 1
+                    remaining = max_wrong - wrong_attempts
+                    if wrong_attempts < max_wrong:
+                        await interaction.followup.send(
+                            f"⏰ Time's up! The correct answer was **{country}**. ({remaining} {'strikes' if remaining > 1 else 'strike'} remaining)"
+                        )
+                    else:
+                        await interaction.followup.send(
+                            f"⏰ Time's up! The correct answer was **{country}**.\n💀 **Game Over!** You reached 5 strikes. Final Score: **{score}**."
+                        )
+                        game_active = False
+                
+                await asyncio.sleep(2)
 
 async def setup(bot):
     await bot.add_cog(FlagGame(bot))
