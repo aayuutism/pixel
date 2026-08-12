@@ -6,11 +6,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-# Import the flag dictionary from flags.py
+# Import your custom flags dictionary from cogs/games/flags.py
 from .flags import FLAGS
 
 
-class ChatFlagGame:
+class CountryGuesser:
     def __init__(self, bot: commands.Bot, user: discord.User, channel: discord.TextChannel):
         self.bot = bot
         self.user = user
@@ -18,23 +18,30 @@ class ChatFlagGame:
         self.score = 0
         self.total = 0
         self.is_active = True
+        self.last_country: str | None = None
 
-    def create_flag_embed(self, flag_url: str) -> discord.Embed:
+    def build_embed(self, flag_url: str) -> discord.Embed:
         embed = discord.Embed(
             title="Guess the country!",
             description="Which country does this flag belong to?",
             color=discord.Color.from_rgb(47, 49, 54),
         )
-        embed.set_thumbnail(url=flag_url)
+        embed.set_image(url=flag_url)
         embed.set_footer(text="type your answer down below!")
         return embed
 
-    async def start(self, interaction: discord.Interaction) -> None:
+    async def run(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message("Starting flag guesser! Get ready...", ephemeral=True)
 
+        # Main game loop — keeps running until self.is_active becomes False
         while self.is_active:
-            country_name, (flag_url, valid_answers) = random.choice(list(FLAGS.items()))
-            embed = self.create_flag_embed(flag_url)
+            # Pick a country that isn't the same as the previous round
+            available_countries = [c for c in FLAGS.keys() if c != self.last_country]
+            country_name = random.choice(available_countries)
+            self.last_country = country_name
+
+            flag_url, accepted_answers = FLAGS[country_name]
+            embed = self.build_embed(flag_url)
 
             await self.channel.send(embed=embed)
 
@@ -46,11 +53,17 @@ class ChatFlagGame:
                 )
 
             try:
-                # Waits 30 seconds for the user to type their answer in chat
+                # Wait 30 seconds for player input
                 guess_msg = await self.bot.wait_for("message", check=check, timeout=30.0)
                 user_guess = guess_msg.content.strip().lower()
 
-                if user_guess in valid_answers:
+                # Allow player to gracefully exit
+                if user_guess in ["quit", "stop", "exit"]:
+                    await self.channel.send(f"Game ended! Final Score: **{self.score}/{self.total}**")
+                    self.is_active = False
+                    break
+
+                if user_guess in accepted_answers:
                     self.score += 1
                     self.total += 1
                     await self.channel.send(
@@ -63,25 +76,25 @@ class ChatFlagGame:
                         f"Aww, incorrect! The correct answer was **{country_name}**.\n"
                         f"Final Streak: **{self.score}/{self.total}**"
                     )
-                    self.is_active = False
+                    self.is_active = False  # Ends the while loop on a wrong guess
 
             except asyncio.TimeoutError:
                 await self.channel.send(
                     f"Time's up! The country was **{country_name}**.\n"
                     f"Final Streak: **{self.score}/{self.total}**"
                 )
-                self.is_active = False
+                self.is_active = False  # Ends the while loop on timeout
 
 
 class CountryGuesserCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="guess", description="Play chat-based flag guesser!")
+    @app_commands.command(name="guess", description="Play infinite flag guesser until you get one wrong!")
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def guess(self, interaction: discord.Interaction):
-        game = ChatFlagGame(self.bot, interaction.user, interaction.channel)
-        await game.start(interaction)
+        game = CountryGuesser(self.bot, interaction.user, interaction.channel)
+        await game.run(interaction)
 
 
 async def setup(bot: commands.Bot):
