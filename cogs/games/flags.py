@@ -612,7 +612,113 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["rwanda", "rw"],
     ),
 
-  # --- T ---
+  # --- S ---
+    "Saint Kitts and Nevis": (
+        "https://em-content.zobj.net/source/apple/354/flag-st-kitts-nevis_1f1f0-1f1f3.png",
+        ["saint kitts and nevis", "st kitts and nevis", "st kitts", "nevis", "kn"],
+    ),
+    "Saint Lucia": (
+        "https://em-content.zobj.net/source/apple/354/flag-st-lucia_1f1f1-1f1e8.png",
+        ["saint lucia", "st lucia", "lc"],
+    ),
+    "Saint Vincent and the Grenadines": (
+        "https://em-content.zobj.net/source/apple/354/flag-st-vincent-grenadines_1f1fb-1f1e8.png",
+        ["saint vincent and the grenadines", "st vincent", "grenadines", "vc"],
+    ),
+    "Samoa": (
+        "https://em-content.zobj.net/source/apple/354/flag-samoa_1f1fc-1f1f8.png",
+        ["samoa", "ws"],
+    ),
+    "San Marino": (
+        "https://em-content.zobj.net/source/apple/354/flag-san-marino_1f1f8-1f1f2.png",
+        ["san marino", "sm"],
+    ),
+    "Sao Tome and Principe": (
+        "https://em-content.zobj.net/source/apple/354/flag-sao-tome-principe_1f1f8-1f1f9.png",
+        ["sao tome and principe", "sao tome", "principe", "st"],
+    ),
+    "Saudi Arabia": (
+        "https://em-content.zobj.net/source/apple/354/flag-saudi-arabia_1f1f8-1f1e6.png",
+        ["saudi arabia", "saudi", "sa"],
+    ),
+    "Senegal": (
+        "https://em-content.zobj.net/source/apple/354/flag-senegal_1f1f8-1f1f3.png",
+        ["senegal", "sn"],
+    ),
+    "Serbia": (
+        "https://em-content.zobj.net/source/apple/354/flag-serbia_1f1f7-1f1f8.png",
+        ["serbia", "rs"],
+    ),
+    "Seychelles": (
+        "https://em-content.zobj.net/source/apple/354/flag-seychelles_1f1f8-1f1e8.png",
+        ["seychelles", "sc"],
+    ),
+    "Sierra Leone": (
+        "https://em-content.zobj.net/source/apple/354/flag-sierra-leone_1f1f8-1f1f1.png",
+        ["sierra leone", "sl"],
+    ),
+    "Singapore": (
+        "https://em-content.zobj.net/source/apple/354/flag-singapore_1f1f8-1f1ec.png",
+        ["singapore", "sg"],
+    ),
+    "Slovakia": (
+        "https://em-content.zobj.net/source/apple/354/flag-slovakia_1f1f8-1f1f0.png",
+        ["slovakia", "sk"],
+    ),
+    "Slovenia": (
+        "https://em-content.zobj.net/source/apple/354/flag-slovenia_1f1f8-1f1ee.png",
+        ["slovenia", "si"],
+    ),
+    "Solomon Islands": (
+        "https://em-content.zobj.net/source/apple/354/flag-solomon-islands_1f1f8-1f1e7.png",
+        ["solomon islands", "sb"],
+    ),
+    "Somalia": (
+        "https://em-content.zobj.net/source/apple/354/flag-somalia_1f1f8-1f1f4.png",
+        ["somalia", "so"],
+    ),
+    "South Africa": (
+        "https://em-content.zobj.net/source/apple/354/flag-south-africa_1f1f8-1f1e6.png",
+        ["south africa", "za"],
+    ),
+    "South Korea": (
+        "https://em-content.zobj.net/source/apple/354/flag-south-korea_1f1f0-1f1f7.png",
+        ["south korea", "sk", "kr"],
+    ),
+    "South Sudan": (
+        "https://em-content.zobj.net/source/apple/354/flag-south-sudan_1f1f8-1f1f8.png",
+        ["south sudan", "ss"],
+    ),
+    "Spain": (
+        "https://em-content.zobj.net/source/apple/354/flag-spain_1f1ea-1f1f8.png",
+        ["spain", "es"],
+    ),
+    "Sri Lanka": (
+        "https://em-content.zobj.net/source/apple/354/flag-sri-lanka_1f1f1-1f1f0.png",
+        ["sri lanka", "lk"],
+    ),
+    "Sudan": (
+        "https://em-content.zobj.net/source/apple/354/flag-sudan_1f1f8-1f1e9.png",
+        ["sudan", "sd"],
+    ),
+    "Suriname": (
+        "https://em-content.zobj.net/source/apple/354/flag-suriname_1f1f8-1f1f7.png",
+        ["suriname", "sr"],
+    ),
+    "Sweden": (
+        "https://em-content.zobj.net/source/apple/354/flag-sweden_1f1f8-1f1ea.png",
+        ["sweden", "se"],
+    ),
+    "Switzerland": (
+        "https://em-content.zobj.net/source/apple/354/flag-switzerland_1f1e8-1f1ed.png",
+        ["switzerland", "ch"],
+    ),
+    "Syria": (
+        "https://em-content.zobj.net/source/apple/354/flag-syria_1f1f8-1f1fe.png",
+        ["syria", "sy"],
+    ),
+    
+    # --- T ---
     "Taiwan": (
         "https://em-content.zobj.net/source/apple/354/flag-taiwan_1f1f9-1f1fc.png",
         ["taiwan", "tw"],
