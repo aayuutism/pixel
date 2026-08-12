@@ -36,7 +36,7 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
         ["argentina", "ar"],
     ),
     "Armenia": (
-        "https://em-content.zobj.net/source/apple/354/flag-armenia_1f1e6-1f1f2.png",
+        "https://em-content.zobj.net/source/apple/354/flag-armenia_1f1e6-1f1f0.png",
         ["armenia", "am"],
     ),
     "Australia": (
@@ -338,10 +338,6 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
     "Ireland": (
         "https://em-content.zobj.net/source/apple/354/flag-ireland_1f1ee-1f1ea.png",
         ["ireland", "ie"],
-    ),
-    "Israel": (
-        "https://em-content.zobj.net/source/apple/354/flag-israel_1f1ee-1f1f1.png",
-        ["israel", "il"],
     ),
     "Italy": (
         "https://em-content.zobj.net/source/apple/354/flag-italy_1f1ee-1f1f9.png",
@@ -835,11 +831,11 @@ FLAGS: dict[str, tuple[str, list[str]]] = {
 
     # --- Z ---
     "Zambia": (
-        "https://em-content.zobj.net/source/apple/354/flag-zambia_1f1f0-1f1f2.png",
+        "https://em-content.zobj.net/source/apple/354/flag-zambia_1f1ff-1f1f2.png",
         ["zambia", "zm"],
     ),
     "Zimbabwe": (
-        "https://em-content.zobj.net/source/apple/354/flag-zimbabwe_1f1f0-1f1fc.png",
+        "https://em-content.zobj.net/source/apple/354/flag-zimbabwe_1f1ff-1f1fc.png",
         ["zimbabwe", "zw"],
     ),
 }
