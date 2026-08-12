@@ -3,6 +3,26 @@ from discord import app_commands
 from discord.ext import commands
 
 
+# Custom View for the button interaction
+class EchoButtonView(discord.ui.View):
+    def __init__(self, author: discord.User | discord.Member):
+        super().__init__(timeout=None)  # Keeps button persistent
+        self.author = author
+
+    @discord.ui.button(
+        label="Sent using echo",
+        style=discord.ButtonStyle.primary,  # Makes the button blue
+        custom_id="echo_sent_by_button",
+    )
+    async def echo_button_callback(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        # Replies back with the "Sent by: @user" message (only visible to the clicker)
+        await interaction.response.send_message(
+            f"*Sent by:* {self.author.mention}", ephemeral=True
+        )
+
+
 class UtilityCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -14,16 +34,15 @@ class UtilityCog(commands.Cog):
     @app_commands.describe(
         message="The message you want the bot to say",
         channel="Input text channel (optional)",
-        no_button="Toggle *Sent using echo* button (optional)",
+        show_button="Attach the 'Sent using echo' button (default: False)",
     )
     async def echo(
         self,
         interaction: discord.Interaction,
         message: str,
         channel: discord.TextChannel | None = None,
-        no_button: bool = False,
+        show_button: bool = False,
     ):
-        # Target specified channel, or default to current channel
         target_channel = channel or interaction.channel
 
         if not target_channel or not isinstance(
@@ -34,7 +53,6 @@ class UtilityCog(commands.Cog):
             )
             return
 
-        # Check permissions before sending
         permissions = target_channel.permissions_for(interaction.user)
         if not permissions.send_messages:
             await interaction.response.send_message(
@@ -43,28 +61,16 @@ class UtilityCog(commands.Cog):
             )
             return
 
-        # Prepare view/button if requested
-        view = None
-        if not no_button:
-            view = discord.ui.View()
-            view.add_item(
-                discord.ui.Button(
-                    label="Sent using echo",
-                    disabled=True,
-                    style=discord.ButtonStyle.secondary,
-                )
-            )
+        # Attach view if show_button is True
+        view = EchoButtonView(author=interaction.user) if show_button else None
 
-        # Send message to target channel
         if view:
             await target_channel.send(content=message, view=view)
         else:
             await target_channel.send(content=message)
 
-        # Acknowledge execution silently to the command user
-        await interaction.response.send_message(
-            f"Message sent to {target_channel.mention}!", ephemeral=True
-        )
+        # Confirm message sent silently to the sender
+        await interaction.response.send_message("Sent!", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):
