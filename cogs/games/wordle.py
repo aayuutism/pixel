@@ -1,138 +1,53 @@
-from __future__ import annotations
+import random
+from cogs.games.words import WORDS
 
-import os
-from typing import Optional
-import discord
-from discord import app_commands
-from discord.ext import commands
+def check_guess(secret: str, guess: str) -> str:
+    """Evaluates the guess against the secret word and returns colored blocks."""
+    result = ["⬛"] * 5
+    secret_letters = list(secret)
+    
+    # First pass: Check for Green (exact position matches)
+    for i in range(5):
+        if guess[i] == secret[i]:
+            result[i] = "🟩"
+            secret_letters[i] = None
 
-# Import your existing core Wordle logic class
-from ..wordle import Wordle
+    # Second pass: Check for Yellow (correct letter, wrong position)
+    for i in range(5):
+        if result[i] != "🟩" and guess[i] in secret_letters:
+            result[i] = "🟨"
+            secret_letters[secret_letters.index(guess[i])] = None
 
+    return "".join(result)
 
-class WordInput(discord.ui.Modal, title="Word Input"):
-    word = discord.ui.TextInput(
-        label="Input your guess",
-        style=discord.TextStyle.short,
-        required=True,
-        min_length=5,
-        max_length=5,
-    )
+def play_wordle():
+    secret_word = random.choice(WORDS).upper()
+    attempts = 6
+    history = []
 
-    def __init__(self, view: WordleView) -> None:
-        super().__init__()
-        self.view = view
+    print("🟩🟨⬛ WELCOME TO WORDLE! ⬛🟨🟩")
+    print("Guess the 5-letter word in 6 tries.\n")
 
-    async def on_submit(self, interaction: discord.Interaction) -> None:
-        content = self.word.value.lower()
-        game = self.view.game
+    for turn in range(1, attempts + 1):
+        while True:
+            guess = input(f"Attempt {turn}/{attempts}: ").strip().upper()
+            if len(guess) == 5 and guess.isalpha():
+                break
+            print("⚠️ Invalid guess! Please enter a 5-letter word.")
 
-        if content not in game._valid_words:
-            return await interaction.response.send_message(
-                "that's not a valid word, try again!", ephemeral=True
-            )
+        feedback = check_guess(secret_word, guess)
+        history.append(f"{guess}  {feedback}")
 
-        won = game.parse_guess(content)
-        buf = await game.render_image()
+        print("\n--- Board ---")
+        for line in history:
+            print(line)
+        print("-------------\n")
 
-        embed = discord.Embed(title="Wordle!", color=self.view.game.embed_color)
-        embed.set_image(url="attachment://wordle.png")
-        file = discord.File(buf, "wordle.png")
+        if guess == secret_word:
+            print(f"🎉 Fantastic! You guessed the word in {turn} tries!")
+            return
 
-        loss = len(game.guesses) >= 6
+    print(f"💀 Game Over! The word was **{secret_word}**.")
 
-        if won:
-            await interaction.channel.send(
-                f"gg {interaction.user.mention}! you got it right 🎉"
-            )
-        elif loss:
-            await interaction.channel.send(
-                f"game over! the word was **{game.word}**."
-            )
-
-        if won or loss:
-            self.view.disable_all_items()
-            self.view.stop()
-
-        await interaction.response.edit_message(
-            embed=embed, attachments=[file], view=self.view
-        )
-
-
-class WordInputButton(discord.ui.Button["WordleView"]):
-    def __init__(self, *, cancel_button: bool = False):
-        super().__init__(
-            label="Cancel" if cancel_button else "Make a guess!",
-            style=discord.ButtonStyle.red if cancel_button else discord.ButtonStyle.blurple,
-        )
-
-    async def callback(self, interaction: discord.Interaction) -> None:
-        game = self.view.game
-        if interaction.user != game.player:
-            return await interaction.response.send_message(
-                "this isn't your game!", ephemeral=True
-            )
-
-        if self.label == "Cancel":
-            await interaction.response.send_message(
-                f"game cancelled. the word was **{game.word}**."
-            )
-            await interaction.message.delete()
-            return self.view.stop()
-        else:
-            return await interaction.response.send_modal(WordInput(self.view))
-
-
-class WordleView(discord.ui.View):
-    def __init__(self, game: BetaWordle, *, timeout: Optional[float] = 180.0):
-        super().__init__(timeout=timeout)
-        self.game = game
-        self.add_item(WordInputButton())
-        self.add_item(WordInputButton(cancel_button=True))
-
-    def disable_all_items(self):
-        for child in self.children:
-            if isinstance(child, discord.ui.Button):
-                child.disabled = True
-
-
-class BetaWordle(Wordle):
-    player: discord.User
-    embed_color: discord.Color
-
-    async def start(
-        self,
-        interaction: discord.Interaction,
-        *,
-        timeout: Optional[float] = 180.0,
-    ) -> None:
-        self.embed_color = discord.Color.random()
-        self.player = interaction.user
-
-        buf = await self.render_image()
-        embed = discord.Embed(title="Wordle!", color=self.embed_color)
-        embed.set_image(url="attachment://wordle.png")
-
-        self.view = WordleView(self, timeout=timeout)
-        
-        await interaction.response.send_message(
-            embed=embed,
-            file=discord.File(buf, "wordle.png"),
-            view=self.view,
-        )
-
-
-class WordleCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
-    @app_commands.command(name="wordle", description="Play a game of Wordle!")
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def wordle(self, interaction: discord.Interaction):
-        game = BetaWordle()
-        await game.start(interaction)
-
-
-async def setup(bot: commands.Bot):
-    if not bot.get_cog("WordleCog"):
-        await bot.add_cog(WordleCog(bot))
+if __name__ == "__main__":
+    play_wordle()
