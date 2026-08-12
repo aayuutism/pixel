@@ -1,6 +1,11 @@
 import random
 from cogs.games.words import WORDS
 
+def get_random_word() -> str:
+    """Flattens the categorized dictionary to pick a random 5-letter word."""
+    all_words = [word for letter_group in WORDS.values() for word in letter_group]
+    return random.choice(all_words).upper()
+
 def check_guess(secret: str, guess: str) -> str:
     """Evaluates the guess against the secret word and returns colored blocks."""
     result = ["⬛"] * 5
@@ -21,7 +26,7 @@ def check_guess(secret: str, guess: str) -> str:
     return "".join(result)
 
 def play_wordle():
-    secret_word = random.choice(WORDS).upper()
+    secret_word = get_random_word()
     attempts = 6
     history = []
 
