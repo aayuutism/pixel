@@ -45,7 +45,7 @@ async def on_ready():
     try:
         streaming_activity = discord.Streaming(
             name="Nothing suspicious going on here :3",
-            url="https://m.youtube.com/watch?v=QDia3e12czc&pp=ygUIcmlja3JvbGw%3D",
+            url="https://www.youtube.com/watch?v=QDia3e12czc",
         )
 
         await bot.change_presence(
