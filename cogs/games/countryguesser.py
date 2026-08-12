@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+import random
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+# Import your custom flags dictionary from cogs/games/flags.py
+from .flags import FLAGS
 
 
 class CountryGuesserCog(commands.Cog):
@@ -13,15 +19,15 @@ class CountryGuesserCog(commands.Cog):
     )
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def countryguesser(self, interaction: discord.Interaction):
-        # Match exact styling: dark embed with description text and flag image
+        # Pick a random country from your FLAGS dictionary
+        random_country = random.choice(list(FLAGS.keys()))
+        flag_url, _ = FLAGS[random_country]
+
         embed = discord.Embed(
             description="### Type your guess below!",
             color=discord.Color.from_rgb(47, 49, 54),
         )
-        # Standard Apple US flag emoji URL for high resolution
-        embed.set_image(
-            url="https://em-content.zobj.net/source/apple/354/flag-united-states_1f1fa-1f1f8.png"
-        )
+        embed.set_image(url=flag_url)
 
         await interaction.response.send_message(embed=embed)
 
