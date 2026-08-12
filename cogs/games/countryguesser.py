@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import random
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+# Import your custom flags dictionary from cogs/games/flags.py
+from .flags import FLAGS
 
 
 class GameControlView(discord.ui.View):
@@ -17,7 +21,6 @@ class GameControlView(discord.ui.View):
     async def quit_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        # UI Placeholder action
         await interaction.response.send_message("Game ended!", ephemeral=True)
 
     @discord.ui.button(
@@ -28,7 +31,6 @@ class GameControlView(discord.ui.View):
     async def hint_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        # UI Placeholder action
         await interaction.response.send_message("Here is a hint!", ephemeral=True)
 
 
@@ -52,13 +54,14 @@ class CountryGuesserCog(commands.Cog):
     )
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def countryguesser(self, interaction: discord.Interaction):
-        # Dummy URL for UI testing
-        sample_flag_url = "https://flagcdn.com/w640/jp.png"
+        # Pick a random country from your FLAGS dictionary
+        random_country = random.choice(list(FLAGS.keys()))
+        flag_url, _ = FLAGS[random_country]
 
-        embed = self.build_embed(sample_flag_url)
+        embed = self.build_embed(flag_url)
         view = GameControlView()
 
-        # Responds with the embed UI directly
+        # Send the UI with a new flag every time
         await interaction.response.send_message(embed=embed, view=view)
 
 
