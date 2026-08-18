@@ -97,16 +97,18 @@ async def main():
     retries = 10
     for i in range(retries):
         try:
-            print(f"Connecting to Discord... (Attempt {i+1}/{retries})")
-            async with bot:
-                await bot.start(os.getenv("DISCORD_TOKEN"))
+            print(f"Connecting to Discord... (Attempt {i+1}/{retries})", flush=True)
+            await bot.start(os.getenv("DISCORD_TOKEN"))
             break
         except discord.HTTPException as e:
             if e.status == 429:
                 wait_time = 60
-                print(f"Hit 429 rate limit. Sleeping for {wait_time}s before retrying...")
+                print(f"Hit 429 rate limit. Sleeping for {wait_time}s before retrying...", flush=True)
+                # Close the old HTTP session cleanly before sleeping
+                await bot.close()
                 await asyncio.sleep(wait_time)
             else:
+                await bot.close()
                 raise e
 
 
