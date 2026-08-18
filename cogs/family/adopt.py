@@ -29,6 +29,20 @@ class AdoptCog(commands.Cog):
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
 
+        is_guild_specific = await database.get_guild_setting(interaction.guild_id)
+        guild_id = interaction.guild_id if is_guild_specific else 0
+
+        # Check existing children count
+        existing_children = await database.get_children(
+            parent_id=interaction.user.id, guild_id=guild_id
+        )
+        if existing_children and len(existing_children) >= 6:
+            embed = discord.Embed(
+                description="You already have 6 children! You can't have any more right now :<",
+                color=random.randint(0, 0xFFFFFF),
+            )
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
         # Proposal Embed
         embed = discord.Embed(
             description=f"Hey {user.mention}, {interaction.user.mention} wants to adopt you! What do you say?",
@@ -47,8 +61,6 @@ class AdoptCog(commands.Cog):
         await view.wait()
 
         if view.accepted:
-            is_guild_specific = await database.get_guild_setting(interaction.guild_id)
-            guild_id = interaction.guild_id if is_guild_specific else 0
             await database.add_adoption(parent_id=interaction.user.id, child_id=user.id, guild_id=guild_id)
 
 
