@@ -3,10 +3,7 @@ import random
 import discord
 from discord import app_commands
 from discord.ext import commands
-
-# Reuse the shared group if it exists, or create it if this file runs standalone
-if not 'games_group' in globals():
-    games_group = app_commands.Group(name="games", description="Play various mini-games!")
+from groups import games_group  # <--- IMPORT SHARED GROUP FROM ROOT
 
 class CookieGameView(discord.ui.View):
     def __init__(self):
@@ -64,6 +61,4 @@ class CookieCog(commands.Cog):
             )
 
 async def setup(bot: commands.Bot):
-    if not bot.tree.get_command("games"):
-        bot.tree.add_command(games_group)
     await bot.add_cog(CookieCog(bot))
