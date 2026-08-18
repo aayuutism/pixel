@@ -3,8 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from . import database
-
-family_group = app_commands.Group(name="family", description="Family management commands")
+from .groups import family_group
 
 
 class DisownSelect(discord.ui.Select):
@@ -107,6 +106,4 @@ class DisownCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    if not bot.tree.get_command("family"):
-        bot.tree.add_command(family_group)
     await bot.add_cog(DisownCog(bot))
