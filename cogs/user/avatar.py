@@ -1,8 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-
-user_group = app_commands.Group(name="user", description="User utility commands")
+from groups import user_group
 
 
 class AvatarCog(commands.Cog):
@@ -75,6 +74,4 @@ class AvatarCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    if not bot.tree.get_command("user"):
-        bot.tree.add_command(user_group)
     await bot.add_cog(AvatarCog(bot))
