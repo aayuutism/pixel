@@ -6,11 +6,32 @@ from discord import app_commands
 from discord.ext import commands
 from data.flags import FLAGS
 
-class StopGameView(discord.ui.View):
-    def __init__(self, author_id: int):
+class GameView(discord.ui.View):
+    def __init__(self, author_id: int, country_name: str):
         super().__init__(timeout=30.0)
         self.author_id = author_id
+        self.country_name = country_name
         self.stopped = False
+        self.hint_used = False
+
+    @discord.ui.button(label="Hint", style=discord.ButtonStyle.primary)
+    async def hint_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author_id:
+            return await interaction.response.send_message("This isn't your game, silly!", ephemeral=True)
+        
+        if self.hint_used:
+            return await interaction.response.send_message("A hint has already been used for this round!", ephemeral=True)
+
+        self.hint_used = True
+        button.disabled = True
+        await interaction.response.edit_message(view=self)
+
+        # Format hint: e.g. "I _ _ _ _ _ _" and length
+        first_letter = self.country_name[0].upper()
+        masked_name = first_letter + "".join(" _ " if char.isalpha() else char for char in self.country_name[1:])
+        
+        hint_msg = f"💡 **Hint:** Starts with **{first_letter}** ({len(self.country_name)} letters)\nPattern: `{masked_name}`"
+        await interaction.followup.send(hint_msg)
 
     @discord.ui.button(label="End Game", style=discord.ButtonStyle.secondary)
     async def stop_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -47,12 +68,12 @@ class FlagGame(commands.Cog):
                 except Exception:
                     continue
 
-            view = StopGameView(author_id=interaction.user.id)
+            view = GameView(author_id=interaction.user.id, country_name=country)
 
             # Display score and remaining lives in the embed
             embed = discord.Embed(
                 title=f"Guess the Country! | Score: {score} | Strikes: {wrong_attempts}/{max_wrong}",
-                description="Type your answer in this channel within 30 seconds!\nClick **End Game** below anytime to exit.",
+                description="Type your answer in this channel within 30 seconds!\nClick **Hint** or **End Game** below anytime.",
                 color=discord.Color(0x8BB96E)
             )
             embed.set_image(url=image_url)
@@ -113,7 +134,7 @@ class FlagGame(commands.Cog):
                             f"Time's up! The correct answer was **{country}**."
                         )
                         await interaction.followup.send(
-                            f"> **Game Over!**\n -# You've maxed out your strikes. Final Score: **{score}**."
+                            f"> **Game Over!**\n -#You've maxed out your strikes. Final Score: **{score}**."
                         )
                         game_active = False
                 
