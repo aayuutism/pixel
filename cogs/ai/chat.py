@@ -3,6 +3,7 @@ import re
 import discord
 from discord.ext import commands
 from groq import AsyncGroq
+from groups import user_group
 
 # Initialize Async Groq Client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
