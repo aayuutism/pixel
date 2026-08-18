@@ -3,9 +3,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+games_group = app_commands.Group(name="games", description="Play various mini-games!")
+
 # --- EMOJIS ---
 PLAYER0 = "<:p0:1536795551213949089>"
-PLAYER1 = "<:p1:1536795556280795236>"
+PLAYER1 = "<:p1:153679556280795236>"
 PLAYER2 = "<:p2:1536795603990741062>"
 TICK_MARK = discord.PartialEmoji.from_str("<:check:1533886268512141393>")
 TADA = "<:tada:1536797799138721812>"
@@ -196,7 +198,7 @@ class ConnectFourCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(
+    @games_group.command(
         name="connectfour", description="Play Connect Four with a friend"
     )
     @app_commands.describe(player="The user you want to play against (optional)")
@@ -266,4 +268,6 @@ class ConnectFourCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
+    if not bot.tree.get_command("games"):
+        bot.tree.add_command(games_group)
     await bot.add_cog(ConnectFourCog(bot))
