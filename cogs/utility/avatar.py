@@ -2,13 +2,15 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+user_group = app_commands.Group(name="user", description="User utility commands")
+
 
 class AvatarCog(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(
+    @user_group.command(
         name="avatar", description="Shows the avatar of a member."
     )
     @app_commands.describe(
@@ -49,4 +51,6 @@ class AvatarCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
+    if not bot.tree.get_command("user"):
+        bot.tree.add_command(user_group)
     await bot.add_cog(AvatarCog(bot))
