@@ -27,7 +27,7 @@ class CookieCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-   @games_group.command(name="cookie", description="Click the cookie first!")
+    @games_group.command(name="cookie", description="Click the cookie first!")
     async def cookie(self, interaction: discord.Interaction):
         # 1. Initial prompt
         await interaction.response.send_message("Get ready... Click the cookie soon!")
@@ -61,4 +61,6 @@ class CookieCog(commands.Cog):
             )
 
 async def setup(bot):
+    if not bot.tree.get_command("games"):
+        bot.tree.add_command(games_group)
     await bot.add_cog(CookieCog(bot))
