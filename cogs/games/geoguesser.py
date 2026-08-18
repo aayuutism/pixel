@@ -1,5 +1,6 @@
 import random
 import asyncio
+import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -36,6 +37,15 @@ class FlagGame(commands.Cog):
 
         while game_active and wrong_attempts < max_wrong:
             country, (image_url, valid_answers) = random.choice(list(FLAGS.items()))
+
+            # Verify image link works before sending embed
+            async with aiohttp.ClientSession() as session:
+                try:
+                    async with session.get(image_url, timeout=3) as resp:
+                        if resp.status != 200:
+                            continue  # Skip broken link and roll another flag
+                except Exception:
+                    continue
 
             view = StopGameView(author_id=interaction.user.id)
 
