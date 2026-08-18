@@ -7,6 +7,9 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+# Import the shared family_group
+from cogs.family.groups import family_group
+
 # Load environment variables
 load_dotenv()
 
@@ -18,19 +21,43 @@ intents.message_content = True
 intents.dm_messages = True
 intents.presences = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+
+class MyBot(commands.Bot):
+
+    async def setup_hook(self):
+        # 1. Register shared app command groups FIRST
+        if not self.tree.get_command("family"):
+            self.tree.add_command(family_group)
+
+        # 2. Load all cogs next
+        if os.path.exists("cogs"):
+            await load_commands(self)
+
+        # 3. Sync command tree AFTER all cogs and subcommands are attached
+        try:
+            synced = await self.tree.sync()
+            print(f"Synced {len(synced)} slash command(s).", flush=True)
+        except Exception as e:
+            print(f"Failed to sync slash commands: {e}", flush=True)
+
+
+bot = MyBot(command_prefix="!", intents=intents)
 
 
 # Helper function to recursively load command files (Cogs) safely
-async def load_commands(directory: str):
-    for root, _, files in os.walk(directory):
+async def load_commands(bot_instance: commands.Bot):
+    for root, _, files in os.walk("cogs"):
         for file in files:
-            # Skip non-cog helper files like database.py or views.py
-            if file.endswith(".py") and not file.startswith("_") and file not in ["database.py", "views.py"]:
+            # Skip non-cog helper files
+            if (
+                file.endswith(".py")
+                and not file.startswith("_")
+                and file not in ["database.py", "views.py", "groups.py"]
+            ):
                 rel_path = os.path.relpath(os.path.join(root, file), start=".")
                 module_name = rel_path[:-3].replace(os.sep, ".")
                 try:
-                    await bot.load_extension(module_name)
+                    await bot_instance.load_extension(module_name)
                     print(f"Loaded extension: {module_name}", flush=True)
                 except commands.ExtensionAlreadyLoaded:
                     print(f"Skipped duplicate extension: {module_name}", flush=True)
@@ -57,17 +84,10 @@ async def on_ready():
     except Exception as e:
         print(f"Failed to set presence: {e}", flush=True)
 
-    # Sync slash commands with Discord API upon startup
-    try:
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} slash command(s).", flush=True)
-    except Exception as e:
-        print(f"Failed to sync slash commands: {e}", flush=True)
-
     print(f"Logged in as {bot.user} (Python Bot Live & Streaming!)", flush=True)
 
 
-# Global Slash Command Error Handler to see exact errors in Render logs
+# Global Slash Command Error Handler
 @bot.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: Exception):
     print(f"[SLASH COMMAND ERROR] Command '{interaction.command.name if interaction.command else 'Unknown'}': {error}", flush=True)
@@ -104,9 +124,6 @@ Thread(target=run_http_server, daemon=True).start()
 
 
 async def main():
-    if os.path.exists("cogs"):
-        await load_commands("cogs")
-
     try:
         print("Connecting to Discord...", flush=True)
         await bot.start(os.getenv("DISCORD_TOKEN"))
