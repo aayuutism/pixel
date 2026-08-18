@@ -6,7 +6,9 @@ from discord import app_commands
 from discord.ext import commands
 from data.flags import FLAGS
 
-games_group = app_commands.Group(name="games", description="Play various mini-games!")
+# Reuse the shared group if it exists, or create it if this file runs standalone
+if not 'games_group' in globals():
+    games_group = app_commands.Group(name="games", description="Play various mini-games!")
 
 class GameView(discord.ui.View):
     def __init__(self, author_id: int, country_name: str):
@@ -50,6 +52,7 @@ class FlagGame(commands.Cog):
         self.bot = bot
 
     @games_group.command(name="geoguesser", description="Guess the countries by their flags!")
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def flag_guesser(self, interaction: discord.Interaction):
         score = 0
         wrong_attempts = 0
@@ -142,7 +145,7 @@ class FlagGame(commands.Cog):
                 
                 await asyncio.sleep(2)
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     if not bot.tree.get_command("games"):
         bot.tree.add_command(games_group)
     await bot.add_cog(FlagGame(bot))
