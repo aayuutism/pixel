@@ -41,9 +41,9 @@ class FlagGame(commands.Cog):
 
             # Display score and remaining lives in the embed
             embed = discord.Embed(
-                title=f"Guess the Flag! | Score: {score} | Strikes: {wrong_attempts}/{max_wrong}",
-                description="Type your answer in this channel within 30 seconds!\nClick **Stop Game** below anytime to exit.",
-                color = discord.Color(0x8BB96E)
+                title=f"Guess the Country! | Score: {score} | Strikes: {wrong_attempts}/{max_wrong}",
+                description="Type your answer in this channel within 30 seconds!\nClick **End Game** below anytime to exit.",
+                color=discord.Color(0x8BB96E)
             )
             embed.set_image(url=image_url)
 
@@ -79,7 +79,10 @@ class FlagGame(commands.Cog):
                         )
                     else:
                         await interaction.followup.send(
-                            f"Wrong! The correct answer was **{country}**.\n\n # > **Game Over!**\n You've maxed out your strikes. Final Score: **{score}**."
+                            f"Wrong! The correct answer was **{country}**."
+                        )
+                        await interaction.followup.send(
+                            f"# > **Game Over!**\nYou've maxed out your strikes. Final Score: **{score}**."
                         )
                         game_active = False
 
@@ -97,7 +100,10 @@ class FlagGame(commands.Cog):
                         )
                     else:
                         await interaction.followup.send(
-                        f"Time's up! The correct answer was **{country}**.\n\n # > **Game Over!**\n You've maxed out your strikes. Final Score: **{score}**."
+                            f"Time's up! The correct answer was **{country}**."
+                        )
+                        await interaction.followup.send(
+                            f"> **Game Over!**\nYou've maxed out your strikes. Final Score: **{score}**."
                         )
                         game_active = False
                 
