@@ -2,12 +2,13 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-# --- CUSTOM EMOJIS & CONSTANTS ---
-P1 = "<:ttt_x:1536802209189339146>"
-P2 = "<:ttt_o:1536802206202724526>"
-TICK_MARK = 1533886268512141393 
-TADA = "<:tada:1536797799138721812>"
-TIMER = "<:timer:1536795548961480806>"
+games_group = app_commands.Group(name="games", description="Play various mini-games!")
+
+# Standard Unicode Symbols & Emojis
+P1 = "❌"
+P2 = "⭕"
+TADA = "🎉"
+TIMER = "⏰"
 
 
 # --- BOARD BUTTON ---
@@ -59,7 +60,7 @@ class TicTacToeButton(discord.ui.Button):
                 final_status = f"{TADA} {view.turn_player.mention} ({symbol}) won the game!"
 
             return await interaction.response.edit_message(
-                content=f" **Tic-Tac-Toe Game Over!**\n\n{final_status}",
+                content=f"**Tic-Tac-Toe Game Over!**\n\n{final_status}",
                 view=view,
             )
 
@@ -139,7 +140,7 @@ class TicTacToeInviteView(discord.ui.View):
         self.game_accepted = False
 
     @discord.ui.button(
-        emoji=discord.PartialEmoji(name="tick", id=TICK_MARK),
+        emoji="✅",
         style=discord.ButtonStyle.success,
     )
     async def accept(
@@ -170,7 +171,7 @@ class TicTacToeCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(
+    @games_group.command(
         name="tictactoe", description="Play TicTacToe with a friend"
     )
     @app_commands.describe(player="The user you want to play against (optional)")
@@ -225,7 +226,7 @@ class TicTacToeCog(commands.Cog):
         await interaction.followup.edit_message(
             message_id=msg.id,
             content=(
-                f" **Tic-Tac-Toe**: {challenger.mention} ({P1}) vs {invite_view.opponent.mention} ({P2})\n\n"
+                f"**Tic-Tac-Toe**: {challenger.mention} ({P1}) vs {invite_view.opponent.mention} ({P2})\n\n"
                 f"{P1} {challenger.mention}, it's your turn!"
             ),
             view=board_view,
@@ -242,4 +243,7 @@ class TicTacToeCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(TicTacToeCog(bot))
+    if not bot.tree.get_command("games"):
+        bot.tree.add_command(games_group)
+    if not bot.get_cog("TicTacToeCog"):
+        await bot.add_cog(TicTacToeCog(bot))
