@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from . import database
-from .groups import family_group
+from groups import family_group
 
 
 class DisownSelect(discord.ui.Select):
