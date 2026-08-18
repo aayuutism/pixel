@@ -2,6 +2,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+games_group = app_commands.Group(name="games", description="Play various mini-games!")
+
 EMOJI_MAP = {
     "rock": "👊",
     "paper": "✋",
@@ -143,7 +145,7 @@ class RPSCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(
+    @games_group.command(
         name="rps", description="Play Rock-Paper-Scissors with a friend"
     )
     @app_commands.describe(
@@ -219,6 +221,7 @@ class RPSCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    # Safely prevent throwing ClientException if already loaded
+    if not bot.tree.get_command("games"):
+        bot.tree.add_command(games_group)
     if not bot.get_cog("RPSCog"):
         await bot.add_cog(RPSCog(bot))
