@@ -3,13 +3,6 @@ from discord.ext import commands
 from discord import app_commands
 import pyfiglet
 
-# Allowed fonts list matching your screenshot
-VALID_FONTS = [
-    "3d-ascii", "3d_diagonal", "5lineoblique", "avatar", 
-    "braced", "cards", "computer", "drpepper", 
-    "fun_face", "keyboard", "konto_slant"
-]
-
 class AsciiCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -19,31 +12,37 @@ class AsciiCog(commands.Cog):
         text="The text you want to convert to ASCII",
         font="The font you want to use for the ASCII"
     )
+    # Add preset choices for the slash command dropdown
+    @app_commands.choices(font=[
+        app_commands.Choice(name="3d_diagonal (Default)", value="3d_diagonal"),
+        app_commands.Choice(name="3d-ascii", value="3d-ascii"),
+        app_commands.Choice(name="5lineoblique", value="5lineoblique"),
+        app_commands.Choice(name="avatar", value="avatar"),
+        app_commands.Choice(name="braced", value="braced"),
+        app_commands.Choice(name="cards", value="cards"),
+        app_commands.Choice(name="computer", value="computer"),
+        app_commands.Choice(name="drpepper", value="drpepper"),
+        app_commands.Choice(name="fun_face", value="fun_face"),
+        app_commands.Choice(name="keyboard", value="keyboard"),
+        app_commands.Choice(name="konto_slant", value="konto_slant"),
+    ])
     async def asciify(
         self, 
         interaction: discord.Interaction, 
         text: str, 
-        font: str = "3d_diagonal"
+        font: app_commands.Choice[str] = None
     ):
-        font_clean = font.lower().strip()
-
-        # Validate font selection
-        if font_clean not in VALID_FONTS:
-            fonts_list_str = ", ".join(VALID_FONTS)
-            error_msg = f"⚠️ {interaction.user.mention}: Invalid font. Available fonts are: {fonts_list_str}"
-            await interaction.response.send_message(error_msg)
-            return
+        # Default to 3d_diagonal if no choice was picked
+        selected_font = font.value if font else "3d_diagonal"
 
         try:
             # Generate ASCII art
-            ascii_art = pyfiglet.figlet_format(text, font=font_clean)
+            ascii_art = pyfiglet.figlet_format(text, font=selected_font)
             
-            # Discord message character limit check
             if len(ascii_art) > 1990:
                 await interaction.response.send_message("⚠️ The output ASCII art is too large for Discord!")
                 return
 
-            # Send result wrapped in codeblock for monospace rendering
             await interaction.response.send_message(f"```\n{ascii_art}\n```")
 
         except Exception as e:
