@@ -2,7 +2,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-games_group = app_commands.Group(name="games", description="Play various mini-games!")
+# Reuse the shared group if it exists, or create it if this file runs standalone
+if not 'games_group' in globals():
+    games_group = app_commands.Group(name="games", description="Play various mini-games!")
 
 # Standard Unicode Symbols & Emojis
 P1 = "❌"
@@ -126,6 +128,9 @@ class TicTacToeBoardView(discord.ui.View):
             return "TIE"
 
         return None
+
+    async def on_timeout(self):
+        self.disable_all_buttons()
 
 
 # --- INVITATION VIEW (STAGE 1) ---
