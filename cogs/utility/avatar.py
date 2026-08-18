@@ -14,7 +14,14 @@ class AvatarCog(commands.Cog):
         name="avatar", description="Shows the avatar of a member."
     )
     @app_commands.describe(
-        target="The user whose avatar you want to see (optional)"
+        target="The user whose avatar you want to see (optional)",
+        avatar_type="Choose between Global or Server avatar (default: Global)",
+    )
+    @app_commands.choices(
+        avatar_type=[
+            app_commands.Choice(name="Global Avatar", value="global"),
+            app_commands.Choice(name="Server Avatar", value="server"),
+        ]
     )
     @app_commands.allowed_contexts(
         guilds=True, dms=True, private_channels=True
@@ -22,13 +29,30 @@ class AvatarCog(commands.Cog):
     async def avatar(
         self,
         interaction: discord.Interaction,
-        target: discord.User | None = None,
+        target: discord.User | discord.Member | None = None,
+        avatar_type: str = "global",
     ):
         target_user = target or interaction.user
-        avatar_url = target_user.display_avatar.with_size(1024).url
+        title = "Global Avatar"
+        
+        # Check if Server Avatar was requested
+        if avatar_type == "server":
+            # Check if target is a Member in a guild
+            if isinstance(target_user, discord.Member) and target_user.guild_avatar:
+                avatar_asset = target_user.guild_avatar
+                title = f"Server Avatar ({interaction.guild.name})" if interaction.guild else "Server Avatar"
+            else:
+                # If target is not a Member (e.g. in DMs) or has no custom server avatar, fallback to display_avatar
+                avatar_asset = target_user.display_avatar
+                title = "Server Avatar (Fallback: Global)"
+        else:
+            # Default to Global Avatar
+            avatar_asset = target_user.display_avatar
+
+        avatar_url = avatar_asset.with_size(1024).url
 
         embed = discord.Embed(
-            title="Global Avatar", url=avatar_url, color=discord.Color.blue()
+            title=title, url=avatar_url, color=discord.Color.blue()
         )
         embed.set_author(
             name=target_user.name, icon_url=target_user.display_avatar.url
@@ -39,7 +63,7 @@ class AvatarCog(commands.Cog):
         view = discord.ui.View()
         view.add_item(
             discord.ui.Button(
-                label="Global Avatar",
+                label=title,
                 style=discord.ButtonStyle.link,
                 url=avatar_url,
             )
