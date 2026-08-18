@@ -35,12 +35,20 @@ class AdoptCog(commands.Cog):
         existing_children = await database.get_children(
             parent_id=interaction.user.id, guild_id=guild_id
         )
-        if existing_children and len(existing_children) >= 6:
-            embed = discord.Embed(
-                description="You already have 6 children! You can't have any more right now :<",
-                color=random.randint(0, 0xFFFFFF),
-            )
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
+        if existing_children:
+            if user.id in existing_children:
+                embed = discord.Embed(
+                    description=f"{user.mention} is already your child!",
+                    color=random.randint(0, 0xFFFFFF),
+                )
+                return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+            if len(existing_children) >= 6:
+                embed = discord.Embed(
+                    description="You already have 6 children! You can't have any more right now :<",
+                    color=random.randint(0, 0xFFFFFF),
+                )
+                return await interaction.response.send_message(embed=embed, ephemeral=True)
 
         # Proposal Embed
         embed = discord.Embed(
