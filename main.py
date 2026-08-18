@@ -25,7 +25,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def load_commands(directory: str):
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith(".py") and not file.startswith("_"):
+           if file.endswith(".py") and not file.startswith("_") and file not in ["database.py", "views.py"]:
                 rel_path = os.path.relpath(os.path.join(root, file), start=".")
                 module_name = rel_path[:-3].replace(os.sep, ".")
                 try:
