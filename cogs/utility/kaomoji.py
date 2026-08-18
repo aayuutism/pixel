@@ -3,8 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-# Use 'from .kaomojis import KAOMOJI_LIST' if kaomojis.py is inside the cogs folder
-from kaomojis import KAOMOJI_LIST 
+from data.kaomojis import KAOMOJI_LIST 
 
 class KaomojiCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
