@@ -4,6 +4,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+games_group = app_commands.Group(name="games", description="Play various mini-games!")
+
 class CookieGameView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=15.0)
@@ -25,7 +27,7 @@ class CookieCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="cookie", description="Click the cookie first!")
+   @games_group.command(name="cookie", description="Click the cookie first!")
     async def cookie(self, interaction: discord.Interaction):
         # 1. Initial prompt
         await interaction.response.send_message("Get ready... Click the cookie soon!")
