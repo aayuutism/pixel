@@ -1,8 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-
-games_group = app_commands.Group(name="games", description="Play various mini-games!")
+from groups import games_group  # <--- IMPORT SHARED GROUP FROM ROOT
 
 EMOJI_MAP = {
     "rock": "👊",
@@ -221,7 +220,5 @@ class RPSCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    if not bot.tree.get_command("games"):
-        bot.tree.add_command(games_group)
     if not bot.get_cog("RPSCog"):
         await bot.add_cog(RPSCog(bot))
