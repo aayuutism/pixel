@@ -6,6 +6,8 @@ from discord import app_commands
 from discord.ext import commands
 from data.flags import FLAGS
 
+games_group = app_commands.Group(name="games", description="Play various mini-games!")
+
 class GameView(discord.ui.View):
     def __init__(self, author_id: int, country_name: str):
         super().__init__(timeout=30.0)
@@ -47,7 +49,7 @@ class FlagGame(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="geoguesser", description="Guess the countries by their flags!")
+    @games_group.command(name="geoguesser", description="Guess the countries by their flags!")
     async def flag_guesser(self, interaction: discord.Interaction):
         score = 0
         wrong_attempts = 0
@@ -141,4 +143,6 @@ class FlagGame(commands.Cog):
                 await asyncio.sleep(2)
 
 async def setup(bot):
+    if not bot.tree.get_command("games"):
+        bot.tree.add_command(games_group)
     await bot.add_cog(FlagGame(bot))
