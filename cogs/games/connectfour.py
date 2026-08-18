@@ -2,8 +2,7 @@ import asyncio
 import discord
 from discord import app_commands
 from discord.ext import commands
-
-games_group = app_commands.Group(name="games", description="Play various mini-games!")
+from groups import games_group  # <--- Changed import
 
 # --- EMOJIS ---
 PLAYER0 = "<:p0:1536795551213949089>"
@@ -268,6 +267,4 @@ class ConnectFourCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    if not bot.tree.get_command("games"):
-        bot.tree.add_command(games_group)
     await bot.add_cog(ConnectFourCog(bot))
