@@ -25,7 +25,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def load_commands(directory: str):
     for root, _, files in os.walk(directory):
         for file in files:
-           if file.endswith(".py") and not file.startswith("_") and file not in ["database.py", "views.py"]:
+            # Skip non-cog helper files like database.py or views.py
+            if file.endswith(".py") and not file.startswith("_") and file not in ["database.py", "views.py"]:
                 rel_path = os.path.relpath(os.path.join(root, file), start=".")
                 module_name = rel_path[:-3].replace(os.sep, ".")
                 try:
@@ -93,8 +94,18 @@ async def main():
     async with bot:
         if os.path.exists("cogs"):
             await load_commands("cogs")
-
-        await bot.start(os.getenv("DISCORD_TOKEN"))
+        retries = 5
+        for i in range(retries):
+            try:
+                await bot.start(os.getenv("DISCORD_TOKEN"))
+                break
+            except discord.HTTPException as e:
+                if e.status == 429:
+                    wait_time = (i + 1) * 30
+                    print(f"Hit Discord 429 rate limit. Retrying in {wait_time}s...")
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise e
 
 
 if __name__ == "__main__":
