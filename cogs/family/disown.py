@@ -12,17 +12,18 @@ class DisownSelect(discord.ui.Select):
         self.parent_id = parent_id
         self.guild_id = guild_id
 
+        # Limit to max 25 options (Discord limit)
         options = [
             discord.SelectOption(
                 label=child.display_name,
                 value=str(child.id),
                 description=f"ID: {child.id}",
             )
-            for child in children_members
+            for child in children_members[:25]
         ]
 
         super().__init__(
-            placeholder="Make a selection",
+            placeholder="Select a child to disown...",
             min_values=1,
             max_values=1,
             options=options,
@@ -44,7 +45,6 @@ class DisownSelect(discord.ui.Select):
             color=random.randint(0, 0xFFFFFF),
         )
 
-        # Edit original message to show final disowned embed and clear the dropdown menu
         await interaction.response.edit_message(embed=embed, view=None)
 
 
@@ -52,7 +52,18 @@ class DisownView(discord.ui.View):
 
     def __init__(self, children_members: list[discord.Member | discord.User], parent_id: int, guild_id: int):
         super().__init__(timeout=60)
+        self.message: discord.InteractionMessage | None = None
         self.add_item(DisownSelect(children_members, parent_id, guild_id))
+
+    async def on_timeout(self):
+        # Disable all items on timeout
+        for item in self.children:
+            item.disabled = True
+        if self.message:
+            try:
+                await self.message.edit(view=self)
+            except discord.HTTPException:
+                pass
 
 
 class DisownCog(commands.Cog):
@@ -61,7 +72,18 @@ class DisownCog(commands.Cog):
         self.bot = bot
 
     @family_group.command(name="disown", description="Disown one of your children.")
-    async def disown(self, interaction: discord.Interaction):
+    async def disown(
+        self,
+        interaction: discord.Interaction,
+        child: discord.Member | None = None,
+    ):
+        if child and child.id == interaction.user.id:
+            embed = discord.Embed(
+                description="You cannot disown yourself!",
+                color=random.randint(0, 0xFFFFFF),
+            )
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
         is_guild_specific = await database.get_guild_setting(interaction.guild_id)
         guild_id = interaction.guild_id if is_guild_specific else 0
 
@@ -77,7 +99,28 @@ class DisownCog(commands.Cog):
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
 
-        # Resolve children IDs into Member/User objects
+        # Direct target specified
+        if child:
+            if child.id not in children_ids:
+                embed = discord.Embed(
+                    description=f"{child.mention} is not your child!",
+                    color=random.randint(0, 0xFFFFFF),
+                )
+                return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+            await database.remove_adoption(
+                parent_id=interaction.user.id, child_id=child.id, guild_id=guild_id
+            )
+            embed = discord.Embed(
+                description=f"You have disowned {child.mention} :(",
+                color=random.randint(0, 0xFFFFFF),
+            )
+            return await interaction.response.send_message(
+                content=f"||{interaction.user.mention} {child.mention}||",
+                embed=embed,
+            )
+
+        # Resolve children IDs into Member/User objects for dropdown menu
         children_members = []
         for child_id in children_ids:
             member = interaction.guild.get_member(child_id) if interaction.guild else None
@@ -103,6 +146,7 @@ class DisownCog(commands.Cog):
 
         view = DisownView(children_members, interaction.user.id, guild_id)
         await interaction.response.send_message(embed=embed, view=view)
+        view.message = await interaction.original_response()
 
 
 async def setup(bot: commands.Bot):
