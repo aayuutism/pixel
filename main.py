@@ -2,18 +2,13 @@ import asyncio
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 from threading import Thread
-
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from groups import family_group, user_group, games_group
 
-# Import the shared family_group
-from cogs.family.groups import family_group
-
-# Load environment variables
 load_dotenv()
 
-# Initialize Bot Client with required intents
 intents = discord.Intents.default()
 intents.guilds = True
 intents.guild_messages = True
@@ -25,15 +20,17 @@ intents.presences = True
 class MyBot(commands.Bot):
 
     async def setup_hook(self):
-        # 1. Register shared app command groups FIRST
+
         if not self.tree.get_command("family"):
             self.tree.add_command(family_group)
+        if not self.tree.get_command("user"):
+            self.tree.add_command(user_group)
+        if not self.tree.get_command("games"):
+            self.tree.add_command(games_group)
 
-        # 2. Load all cogs next
         if os.path.exists("cogs"):
             await load_commands(self)
-
-        # 3. Sync command tree AFTER all cogs and subcommands are attached
+            
         try:
             synced = await self.tree.sync()
             print(f"Synced {len(synced)} slash command(s).", flush=True)
@@ -43,12 +40,9 @@ class MyBot(commands.Bot):
 
 bot = MyBot(command_prefix="!", intents=intents)
 
-
-# Helper function to recursively load command files (Cogs) safely
 async def load_commands(bot_instance: commands.Bot):
     for root, _, files in os.walk("cogs"):
         for file in files:
-            # Skip non-cog helper files
             if (
                 file.endswith(".py")
                 and not file.startswith("_")
@@ -87,7 +81,6 @@ async def on_ready():
     print(f"Logged in as {bot.user} (Python Bot Live & Streaming!)", flush=True)
 
 
-# Global Slash Command Error Handler
 @bot.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: Exception):
     print(f"[SLASH COMMAND ERROR] Command '{interaction.command.name if interaction.command else 'Unknown'}': {error}", flush=True)
@@ -100,7 +93,6 @@ async def on_app_command_error(interaction: discord.Interaction, error: Exceptio
         pass
 
 
-# Keep-alive HTTP server for Render port check
 class KeepAliveHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -110,8 +102,7 @@ class KeepAliveHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"Bot is awake!")
 
     def log_message(self, format, *args):
-        return  # Silence standard HTTP server logs in console
-
+        return 
 
 def run_http_server():
     port = int(os.getenv("PORT", 3000))
@@ -119,7 +110,6 @@ def run_http_server():
     server.serve_forever()
 
 
-# Run keep-alive server in a background thread
 Thread(target=run_http_server, daemon=True).start()
 
 
