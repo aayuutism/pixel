@@ -91,21 +91,22 @@ Thread(target=run_http_server, daemon=True).start()
 
 
 async def main():
-    async with bot:
-        if os.path.exists("cogs"):
-            await load_commands("cogs")
-        retries = 5
-        for i in range(retries):
-            try:
+    if os.path.exists("cogs"):
+        await load_commands("cogs")
+
+    retries = 10
+    for i in range(retries):
+        try:
+            async with bot:
                 await bot.start(os.getenv("DISCORD_TOKEN"))
-                break
-            except discord.HTTPException as e:
-                if e.status == 429:
-                    wait_time = (i + 1) * 30
-                    print(f"Hit Discord 429 rate limit. Retrying in {wait_time}s...")
-                    await asyncio.sleep(wait_time)
-                else:
-                    raise e
+            break  # Exit loop if normal shutdown occurs
+        except discord.HTTPException as e:
+            if e.status == 429:
+                wait_time = 60  # Wait 1 minute before retrying
+                print(f"Hit Discord rate limit (429). Waiting {wait_time}s before retrying (Attempt {i+1}/{retries})...")
+                await asyncio.sleep(wait_time)
+            else:
+                raise e
 
 
 if __name__ == "__main__":
