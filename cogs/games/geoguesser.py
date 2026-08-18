@@ -103,7 +103,7 @@ class FlagGame(commands.Cog):
                             f"Time's up! The correct answer was **{country}**."
                         )
                         await interaction.followup.send(
-                            f"> **Game Over!**\nYou've maxed out your strikes. Final Score: **{score}**."
+                            f"> **Game Over!**\n -#You've maxed out your strikes. Final Score: **{score}**."
                         )
                         game_active = False
                 
