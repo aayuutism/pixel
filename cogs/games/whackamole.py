@@ -4,6 +4,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+games_group = app_commands.Group(name="games", description="Play various mini-games!")
+
+
 class MoleButton(discord.ui.Button):
     def __init__(self, x: int, y: int):
         super().__init__(style=discord.ButtonStyle.secondary, label="🕳️", row=y)
@@ -69,7 +72,7 @@ class WhackAMoleView(discord.ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.author_id:
-            await interaction.response.send_message("Start your own game with `/whackamole`!", ephemeral=True)
+            await interaction.response.send_message("Start your own game with `/games whackamole`!", ephemeral=True)
             return False
         return True
 
@@ -78,7 +81,7 @@ class WhackAMoleCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="whackamole", description="Whack moles, avoid bombs, and survive!")
+    @games_group.command(name="whackamole", description="Whack moles, avoid bombs, and survive!")
     async def whackamole(self, interaction: discord.Interaction):
         await interaction.response.defer()
         
@@ -144,7 +147,7 @@ class WhackAMoleCog(commands.Cog):
                     child.disabled = True
 
                 await interaction.edit_original_response(
-                    content=f"️️⚡ **Safe! You avoided the bomb!**\nScore: **{view.score}** | Strikes: **{view.strikes}/{max_strikes}**",
+                    content=f"⚡ **Safe! You avoided the bomb!**\nScore: **{view.score}** | Strikes: **{view.strikes}/{max_strikes}**",
                     view=view
                 )
                 await asyncio.sleep(0.8)
@@ -165,4 +168,6 @@ class WhackAMoleCog(commands.Cog):
         )
 
 async def setup(bot):
+    if not bot.tree.get_command("games"):
+        bot.tree.add_command(games_group)
     await bot.add_cog(WhackAMoleCog(bot))
