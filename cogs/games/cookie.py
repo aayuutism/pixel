@@ -4,7 +4,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-games_group = app_commands.Group(name="games", description="Play various mini-games!")
+# Reuse the shared group if it exists, or create it if this file runs standalone
+if not 'games_group' in globals():
+    games_group = app_commands.Group(name="games", description="Play various mini-games!")
 
 class CookieGameView(discord.ui.View):
     def __init__(self):
@@ -28,6 +30,7 @@ class CookieCog(commands.Cog):
         self.bot = bot
 
     @games_group.command(name="cookie", description="Click the cookie first!")
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def cookie(self, interaction: discord.Interaction):
         # 1. Initial prompt
         await interaction.response.send_message("Get ready... Click the cookie soon!")
@@ -60,7 +63,7 @@ class CookieCog(commands.Cog):
                 view=view
             )
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     if not bot.tree.get_command("games"):
         bot.tree.add_command(games_group)
     await bot.add_cog(CookieCog(bot))
