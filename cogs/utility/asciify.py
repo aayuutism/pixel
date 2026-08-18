@@ -12,9 +12,8 @@ class AsciiCog(commands.Cog):
         text="The text you want to convert to ASCII",
         font="The font you want to use for the ASCII"
     )
-    # Add preset choices for the slash command dropdown
     @app_commands.choices(font=[
-        app_commands.Choice(name="3d_diagonal (Default)", value="3d_diagonal"),
+        app_commands.Choice(name="3d_diagonal", value="3d_diagonal"),
         app_commands.Choice(name="3d-ascii", value="3d-ascii"),
         app_commands.Choice(name="5lineoblique", value="5lineoblique"),
         app_commands.Choice(name="avatar", value="avatar"),
@@ -30,10 +29,10 @@ class AsciiCog(commands.Cog):
         self, 
         interaction: discord.Interaction, 
         text: str, 
-        font: app_commands.Choice[str] = None
+        font: str = "3d_diagonal" # <--- Ensures default is 3d_diagonal
     ):
-        # Default to 3d_diagonal if no choice was picked
-        selected_font = font.value if font else "3d_diagonal"
+        # Extract string value whether Discord sends Choice object or string
+        selected_font = font.value if isinstance(font, app_commands.Choice) else (font or "3d_diagonal")
 
         try:
             # Generate ASCII art
