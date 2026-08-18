@@ -3,7 +3,7 @@ import asyncio
 import discord
 from discord import app_commands
 from discord.ext import commands
-from cogs.games.flags import FLAGS
+from data.flags import FLAGS
 
 class StopGameView(discord.ui.View):
     def __init__(self, author_id: int):
@@ -11,8 +11,8 @@ class StopGameView(discord.ui.View):
         self.author_id = author_id
         self.stopped = False
 
-@discord.ui.button(label="End Game", style=discord.ButtonStyle.secondary)
-async def stop_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    @discord.ui.button(label="End Game", style=discord.ButtonStyle.secondary)
+    async def stop_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author_id:
             return await interaction.response.send_message("This isn't your game, silly!", ephemeral=True)
         
@@ -79,7 +79,7 @@ class FlagGame(commands.Cog):
                         )
                     else:
                         await interaction.followup.send(
-                         f"Wrong! The correct answer was **{country}**.\n\n # > **Game Over!**\n You've maxed out your strikes. Final Score: **{score}**."
+                            f"Wrong! The correct answer was **{country}**.\n\n # > **Game Over!**\n You've maxed out your strikes. Final Score: **{score}**."
                         )
                         game_active = False
 
