@@ -125,7 +125,7 @@ class ConnectFourCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @games_group.command(name="games-connectfour", description="Play Connect Four with a friend")
+    @app_commands.command(name="games-connectfour", description="Play Connect Four with a friend")
     @app_commands.describe(player="The user you want to play against (leave blank for anyone)")
     async def connectfour(self, interaction: discord.Interaction, player: discord.User | None = None):
         await interaction.response.defer()
