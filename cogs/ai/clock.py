@@ -58,7 +58,7 @@ class RoastCog(commands.Cog):
         except Exception as error:
             print(f"Roast Command Error: {error}")
             await interaction.followup.send(
-                "The AI took one look at you nd opted for silence. Count your blessings,twin."
+                "The AI took one look at you and opted for silence. Count your blessings."
             )
 
 
