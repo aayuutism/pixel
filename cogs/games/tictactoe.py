@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import games_group  # <--- IMPORT SHARED GROUP FROM ROOT
+from groups import games_group
 
 # Standard Unicode Symbols & Emojis
 P1 = "❌"
@@ -245,5 +245,4 @@ class TicTacToeCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    if not bot.get_cog("TicTacToeCog"):
-        await bot.add_cog(TicTacToeCog(bot))
+    await bot.add_cog(TicTacToeCog(bot))
