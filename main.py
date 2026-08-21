@@ -25,7 +25,7 @@ class MyBot(commands.Bot):
         if os.path.exists("cogs"):
             for root, _, files in os.walk("cogs"):
                 for file in files:
-                    if file.endswith(".py") and not file.startswith("_"):
+                    if file.endswith(".py") and not file.startswith("_") and file not in ("views.py", "database.py"):
                         rel_path = os.path.relpath(os.path.join(root, file), start=".")
                         cog_name = rel_path[:-3].replace(os.sep, ".")
                         
@@ -35,8 +35,8 @@ class MyBot(commands.Bot):
                         except Exception as e:
                             print(f"Oops, failed to load {cog_name}: {e}")
 
-        #Sync command tree with Discord
-        self.tree.clear_commands(guild=None)
+      # Sync command tree with Discord
+      # self.tree.clear_commands(guild=None)
         await self.tree.sync()
         print("All slash commands synced with Discord!")
 
