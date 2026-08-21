@@ -5,10 +5,10 @@ from threading import Thread
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from groups import ai_group, games_group, user_group
 
 load_dotenv()
 
-# Set up basic bot intents
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -16,9 +16,12 @@ intents.message_content = True
 class MyBot(commands.Bot):
 
     async def setup_hook(self):
-        # Automatically load every extension/cog inside the cogs folder
-        # Discord.py will automatically detect and register the commands 
-        # inside your cogs, even those using the groups imported from groups.py
+        # Registering parent groups to the command tree first
+        self.tree.add_command(games_group)
+        self.tree.add_command(ai_group)
+        self.tree.add_command(user_group)
+
+        # Automatically loading every extension/cog inside the cogs folder
         if os.path.exists("cogs"):
             for root, _, files in os.walk("cogs"):
                 for file in files:
@@ -32,19 +35,17 @@ class MyBot(commands.Bot):
                         except Exception as e:
                             print(f"Oops, failed to load {cog_name}: {e}")
 
-        # Sync the command tree with Discord
-        # self.tree.clear_commands(guild=None)
+        #Sync command tree with Discord
+        self.tree.clear_commands(guild=None)
         await self.tree.sync()
         print("All slash commands synced with Discord!")
 
 
-# Initialize the bot instance
 bot = MyBot(command_prefix="!", intents=intents)
 
 
 @bot.event
 async def on_ready():
-    # Set a nice streaming status when the bot boots up
     activity = discord.Streaming(
         name="Nothing suspicious going on here :3",
         url="https://www.youtube.com/watch?v=QDia3e12czc",
