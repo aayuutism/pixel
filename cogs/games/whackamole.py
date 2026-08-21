@@ -3,7 +3,7 @@ import random
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import games_group  # <--- IMPORT SHARED GROUP FROM ROOT
+from groups import games_group
 
 
 class MoleButton(discord.ui.Button):
