@@ -5,9 +5,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from data.flags import FLAGS
-from groups import games_group  # <--- IMPORT SHARED GROUP FROM ROOT
+from groups import games_group
+
 
 class GameView(discord.ui.View):
+
     def __init__(self, author_id: int, country_name: str):
         super().__init__(timeout=30.0)
         self.author_id = author_id
@@ -27,7 +29,6 @@ class GameView(discord.ui.View):
         button.disabled = True
         await interaction.response.edit_message(view=self)
 
-        # Format hint: e.g. "I _ _ _ _ _ _" and length
         first_letter = self.country_name[0].upper()
         masked_name = first_letter + "".join(" _ " if char.isalpha() else char for char in self.country_name[1:])
         
@@ -44,7 +45,9 @@ class GameView(discord.ui.View):
         button.disabled = True
         await interaction.response.edit_message(view=self)
 
+
 class FlagGame(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -61,18 +64,16 @@ class FlagGame(commands.Cog):
         while game_active and wrong_attempts < max_wrong:
             country, (image_url, valid_answers) = random.choice(list(FLAGS.items()))
 
-            # Verify image link works before sending embed
             async with aiohttp.ClientSession() as session:
                 try:
                     async with session.get(image_url, timeout=3) as resp:
                         if resp.status != 200:
-                            continue  # Skip broken link and roll another flag
+                            continue
                 except Exception:
                     continue
 
             view = GameView(author_id=interaction.user.id, country_name=country)
 
-            # Display score and remaining lives in the embed
             embed = discord.Embed(
                 title=f"Guess the Country! | Score: {score} | Strikes: {wrong_attempts}/{max_wrong}",
                 description="Type your answer in this channel within 30 seconds!\nClick **Hint** or **End Game** below anytime.",
@@ -82,7 +83,6 @@ class FlagGame(commands.Cog):
 
             await interaction.followup.send(embed=embed, view=view)
 
-            # Accept any text response from the game host to process right/wrong guesses
             def check(m: discord.Message):
                 return (
                     m.channel.id == interaction.channel_id
@@ -141,6 +141,7 @@ class FlagGame(commands.Cog):
                         game_active = False
                 
                 await asyncio.sleep(2)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(FlagGame(bot))
