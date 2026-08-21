@@ -1,7 +1,6 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import user_group
 
 
 class AvatarCog(commands.Cog):
@@ -9,8 +8,8 @@ class AvatarCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @user_group.command(
-        name="avatar", description="Shows the avatar of a member."
+    @app_commands.command(
+        name="user-avatar", description="Shows the avatar of a member."
     )
     @app_commands.describe(
         target="The user whose avatar you want to see (optional)",
