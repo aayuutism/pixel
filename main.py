@@ -20,7 +20,7 @@ class MyBot(commands.Bot):
         self.tree.add_command(games_group)
         self.tree.add_command(ai_group)
         self.tree.add_command(user_group)
-        self.tree.add_command(family_group)
+      # self.tree.add_command(family_group)
 
         # Automatically loading every extension/cog inside the cogs folder
         if os.path.exists("cogs"):
