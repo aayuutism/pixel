@@ -3,8 +3,6 @@ import random
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import games_group
-
 
 class MoleButton(discord.ui.Button):
 
@@ -87,8 +85,8 @@ class WhackAMoleCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @games_group.command(
-        name="whackamole",
+    @app_commands.command(
+        name="games-whackamole",
         description="Whack moles, avoid bombs, and survive!",
     )
     @app_commands.allowed_contexts(
