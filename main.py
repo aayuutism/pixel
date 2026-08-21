@@ -40,6 +40,10 @@ class MyBot(commands.Bot):
                             print(f"Oops, failed to load {cog_name}: {e}")
 
         # Sync the command tree with Discord
+        # DELETABLE LINE GRAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+        self.tree.clear_commands(guild=None)
+
+        
         await self.tree.sync()
         print("All slash commands synced with Discord!")
 
