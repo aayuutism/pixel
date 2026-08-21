@@ -3,12 +3,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from groq import AsyncGroq
-from groups import ai_group
 
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-CLOCK_SYSTEM_PROMPT = """You are Pixel, a witty AI companion on Discord who delivers light, sarcastic roasts.
+ROAST_SYSTEM_PROMPT = """You are Pixel, a witty AI companion on Discord who delivers light, sarcastic roasts.
 Rules:
 - Texting Style: Casual, lowkey, and dry.
 - Vibe: Calmly sarcastic and direct—more like deadpan side-eye than loud yelling.
@@ -16,19 +15,19 @@ Rules:
 - Length: Deliver a quick, clever roast in 1-2 short sentences."""
 
 
-class ClockCog(commands.Cog):
+class RoastCog(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @ai_group.command(
-        name="clock", description="Clock someone via AI"
+    @app_commands.command(
+        name="ai-roast", description="Roast someone via AI"
     )
-    @app_commands.describe(target="Who's being clocked?")
+    @app_commands.describe(target="Who's being roasted?")
     @app_commands.allowed_contexts(
         guilds=True, dms=True, private_channels=True
     )
-    async def clock(
+    async def roast(
         self, interaction: discord.Interaction, target: discord.User
     ):
         await interaction.response.defer()
@@ -37,32 +36,32 @@ class ClockCog(commands.Cog):
             response = await groq_client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[
-                    {"role": "system", "content": CLOCK_SYSTEM_PROMPT},
+                    {"role": "system", "content": ROAST_SYSTEM_PROMPT},
                     {
                         "role": "user",
-                        "content": f"Clock, roast, and humble {target.display_name} right now!",
+                        "content": f"Roast {target.display_name} right now!",
                     },
                 ],
             )
 
-            clock_text = response.choices[0].message.content
+            roast_text = response.choices[0].message.content
 
-            if not clock_text:
+            if not roast_text:
                 return await interaction.followup.send(
-                    "System Error: Too dry to process."
+                    "System Error: Way too dry to process."
                 )
 
             await interaction.followup.send(
-                f"{target.mention}, {clock_text.strip()}"
+                f"{target.mention}, {roast_text.strip()}"
             )
 
         except Exception as error:
-            print(f"Clock Command Error: {error}")
+            print(f"Roast Command Error: {error}")
             await interaction.followup.send(
-                "AI took one look and opted for silence. Count your blessings."
+                "The AI took one look at you nd opted for silence. Count your blessings,twin."
             )
 
 
 async def setup(bot: commands.Bot):
-    if not bot.get_cog("ClockCog"):
-        await bot.add_cog(ClockCog(bot))
+    if not bot.get_cog("RoastCog"):
+        await bot.add_cog(RoastCog(bot))
