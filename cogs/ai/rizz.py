@@ -3,7 +3,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from groq import AsyncGroq
-from groups import ai_group
 
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
@@ -21,8 +20,8 @@ class RizzCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @ai_group.command(
-        name="rizz", description="Rizz someone up via AI :3"
+    @app_commands.command(
+        name="ai-rizz", description="Rizz someone up via AI :3"
     )
     @app_commands.describe(target="Who are we rizzing up?")
     @app_commands.allowed_contexts(
