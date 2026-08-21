@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import games_group  # <--- IMPORT SHARED GROUP FROM ROOT
+from groups import games_group
 
 EMOJI_MAP = {
     "rock": "👊",
@@ -10,11 +10,10 @@ EMOJI_MAP = {
 }
 
 
-# --- RPS GAME VIEW (STAGE 2) ---
 class RPSGameView(discord.ui.View):
 
     def __init__(self, challenger: discord.User, opponent: discord.User):
-        super().__init__(timeout=120)  # 2 minutes
+        super().__init__(timeout=120)
         self.challenger = challenger
         self.opponent = opponent
         self.moves: dict[int, str] = {}
@@ -49,7 +48,6 @@ class RPSGameView(discord.ui.View):
 
             self.moves[user_id] = move_choice
 
-            # First move locked
             if len(self.moves) == 1:
                 waiting_for = (
                     self.opponent
@@ -68,7 +66,6 @@ class RPSGameView(discord.ui.View):
                     view=self,
                 )
 
-            # Both moves locked -> Determine Winner
             elif len(self.moves) == 2:
                 self.update_buttons(disabled=True)
                 self.stop()
@@ -104,13 +101,12 @@ class RPSGameView(discord.ui.View):
         return move_callback
 
 
-# --- INVITATION VIEW (STAGE 1) ---
 class RPSInviteView(discord.ui.View):
 
     def __init__(
         self, challenger: discord.User, opponent: discord.User | None
     ):
-        super().__init__(timeout=60)  # 60 seconds
+        super().__init__(timeout=60)
         self.challenger = challenger
         self.opponent = opponent
         self.game_accepted = False
@@ -138,7 +134,6 @@ class RPSInviteView(discord.ui.View):
         self.stop()
 
 
-# --- MAIN COG ---
 class RPSCog(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
@@ -184,7 +179,6 @@ class RPSCog(commands.Cog):
         )
         msg = await interaction.original_response()
 
-        # Wait for invitation response or timeout
         timed_out = await invite_view.wait()
         if timed_out or not invite_view.game_accepted:
             invite_view.accept.disabled = True
@@ -197,12 +191,11 @@ class RPSCog(commands.Cog):
                 message_id=msg.id, content=expired_text, view=invite_view
             )
 
-        # Transition to game board in command scope
         game_view = RPSGameView(challenger, invite_view.opponent)
         await interaction.followup.edit_message(
             message_id=msg.id,
             content=(
-                f"{challenger.mention} {invite_view.opponent.mention}\n"
+                f"{challenger.mention} vs {invite_view.opponent.mention}\n"
                 f"> ### Any of you can go first\n"
                 f"> Click a button to make your move"
             ),
@@ -220,5 +213,4 @@ class RPSCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    if not bot.get_cog("RPSCog"):
-        await bot.add_cog(RPSCog(bot))
+    await bot.add_cog(RPSCog(bot))
