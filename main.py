@@ -5,7 +5,6 @@ from threading import Thread
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from groups import ai_group, games_group, user_group
 
 load_dotenv()
 
@@ -16,11 +15,6 @@ intents.message_content = True
 class MyBot(commands.Bot):
 
     async def setup_hook(self):
-        # Registering parent groups to the command tree first
-        self.tree.add_command(games_group)
-        self.tree.add_command(ai_group)
-        self.tree.add_command(user_group)
-      # self.tree.add_command(family_group)
 
         # Automatically loading every extension/cog inside the cogs folder
         if os.path.exists("cogs"):
@@ -41,7 +35,7 @@ class MyBot(commands.Bot):
         print("All slash commands synced with Discord!")
 
 
-bot = MyBot(command_prefix="!", intents=intents)
+bot = MyBot(command_prefix="?", intents=intents)
 
 
 @bot.event
@@ -61,7 +55,7 @@ async def on_app_command_error(interaction: discord.Interaction, error: Exceptio
 
     actual_error = getattr(error, "original", error)
     traceback.print_exception(type(actual_error), actual_error, actual_error.__traceback__)
-    error_message = f"Welp, it's bitching. AGAIN: {type(actual_error).__name__}"
+    error_message = f"Say hi to more errors, yay! :D : {type(actual_error).__name__}"
     
     if not interaction.response.is_done():
         await interaction.response.send_message(error_message, ephemeral=True)
