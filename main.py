@@ -31,7 +31,6 @@ class MyBot(commands.Bot):
                         
                         try:
                             await self.load_extension(cog_name)
-                            print(f"Loaded cog: {cog_name}")
                         except Exception as e:
                             print(f"Oops, failed to load {cog_name}: {e}")
 
@@ -55,11 +54,14 @@ async def on_ready():
 
 
 @bot.tree.error
+
 async def on_app_command_error(interaction: discord.Interaction, error: Exception):
     import traceback
-    traceback.print_exception(type(error), error, error.__traceback__)
 
-    error_message = "Welp, it's bitching. AGAIN."
+    actual_error = getattr(error, "original", error)
+    traceback.print_exception(type(actual_error), actual_error, actual_error.__traceback__)
+    error_message = f"Welp, it's bitching. AGAIN: {type(actual_error).__name__}"
+    
     if not interaction.response.is_done():
         await interaction.response.send_message(error_message, ephemeral=True)
     else:
