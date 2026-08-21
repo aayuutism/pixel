@@ -20,10 +20,19 @@ intents.presences = True
 class MyBot(commands.Bot):
 
     async def setup_hook(self):
+        # 1. Add the root groups to the tree FIRST
+        if not self.tree.get_command("family"):
+            self.tree.add_command(family_group)
+        if not self.tree.get_command("user"):
+            self.tree.add_command(user_group)
+        if not self.tree.get_command("games"):
+            self.tree.add_command(games_group)
 
+        # 2. THEN load your cogs (which attach the subcommands)
         if os.path.exists("cogs"):
             await load_commands(self)
             
+        # 3. Finally, sync the tree with Discord
         try:
             synced = await self.tree.sync()
             print(f"Synced {len(synced)} slash command(s).", flush=True)
