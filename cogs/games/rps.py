@@ -1,7 +1,6 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import games_group
 
 EMOJI_MAP = {
     "rock": "👊",
@@ -139,8 +138,8 @@ class RPSCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @games_group.command(
-        name="rps", description="Play Rock-Paper-Scissors with a friend"
+    @app_commands.command(
+        name="games-rockpaperscissor", description="Play Rock-Paper-Scissors with a friend"
     )
     @app_commands.describe(
         player="The user you want to play against (optional)"
