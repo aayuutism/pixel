@@ -21,7 +21,7 @@ class GlazeCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="glaze", description="Glaze someone via AI"
+        name="ai-glaze", description="Glaze someone via AI"
     )
     @app_commands.describe(target="Who do you wanna glaze?")
     @app_commands.allowed_contexts(
