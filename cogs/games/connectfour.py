@@ -2,7 +2,6 @@ import asyncio
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import games_group
 
 PLAYER0 = "<:p0:1536795551213949089>"
 PLAYER1 = "<:p1:153679556280795236>"
@@ -126,7 +125,7 @@ class ConnectFourCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @games_group.command(name="connectfour", description="Play Connect Four with a friend")
+    @games_group.command(name="games-connectfour", description="Play Connect Four with a friend")
     @app_commands.describe(player="The user you want to play against (leave blank for anyone)")
     async def connectfour(self, interaction: discord.Interaction, player: discord.User | None = None):
         await interaction.response.defer()
