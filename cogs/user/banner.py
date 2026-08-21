@@ -1,7 +1,6 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import user_group
 
 
 class BannerCog(commands.Cog):
@@ -9,8 +8,8 @@ class BannerCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @user_group.command(
-        name="banner", description="Shows the user banner of a member."
+    @app_commands.command(
+        name="user-banner", description="Shows the user banner of a member."
     )
     @app_commands.describe(
         target="The user whose banner you want to see (optional)",
