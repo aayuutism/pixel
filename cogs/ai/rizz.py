@@ -21,7 +21,7 @@ class RizzCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(
+    @ai_group.command(
         name="rizz", description="Rizz someone up via AI :3"
     )
     @app_commands.describe(target="Who are we rizzing up?")
