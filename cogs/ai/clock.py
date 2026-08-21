@@ -21,7 +21,7 @@ class ClockCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(
+    @ai_group.command(
         name="clock", description="Clock someone via AI"
     )
     @app_commands.describe(target="Who's being clocked?")
