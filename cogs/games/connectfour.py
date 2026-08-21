@@ -4,7 +4,6 @@ from discord import app_commands
 from discord.ext import commands
 from groups import games_group
 
-# --- Custom Game Emojis ---
 PLAYER0 = "<:p0:1536795551213949089>"
 PLAYER1 = "<:p1:153679556280795236>"
 PLAYER2 = "<:p2:1536795603990741062>"
@@ -15,10 +14,9 @@ NUMBERS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7�
 
 
 class ConnectFourBoardView(discord.ui.View):
-    """Handles the actual Connect Four game grid and button interactions."""
 
     def __init__(self, challenger: discord.User, opponent: discord.User):
-        super().__init__(timeout=300)  # 5 minutes per game
+        super().__init__(timeout=300)
         self.challenger = challenger
         self.opponent = opponent
         self.turn_player = challenger
@@ -30,15 +28,12 @@ class ConnectFourBoardView(discord.ui.View):
         self.update_buttons()
 
     def render(self) -> str:
-        """Renders the grid into a pretty text string."""
         grid_text = "\n".join("".join(row) for row in self.board)
         return f"{grid_text}\n{''.join(NUMBERS)}"
 
     def update_buttons(self, disabled: bool = False):
-        """Builds or updates column selection buttons based on board state."""
         self.clear_items()
         for col in range(self.cols):
-            # Disable column buttons if the top row is already filled
             is_full = self.board[0][col] != PLAYER0
             
             button = discord.ui.Button(
@@ -52,22 +47,18 @@ class ConnectFourBoardView(discord.ui.View):
             self.add_item(button)
 
     def make_callback(self, col: int):
-        """Generates a click handler for each specific column button."""
         async def callback(interaction: discord.Interaction):
-            # Make sure it's the right player's turn
             if interaction.user.id != self.turn_player.id:
                 return await interaction.response.send_message(
                     f"Hold on! It's {self.turn_player.mention}'s turn right now.", ephemeral=True
                 )
 
-            # Drop the piece into the lowest available slot in the column
             current_symbol = self.symbols[self.turn_player.id]
             for r in range(self.rows - 1, -1, -1):
                 if self.board[r][col] == PLAYER0:
                     self.board[r][col] = current_symbol
                     break
 
-            # Check if this move won the game
             if self.check_win(current_symbol):
                 self.update_buttons(disabled=True)
                 self.stop()
@@ -76,7 +67,6 @@ class ConnectFourBoardView(discord.ui.View):
                     view=self,
                 )
 
-            # Check for a tie (full top row)
             if all(cell != PLAYER0 for cell in self.board[0]):
                 self.update_buttons(disabled=True)
                 self.stop()
@@ -84,7 +74,6 @@ class ConnectFourBoardView(discord.ui.View):
                     content=f"It's a tie! Great match.\n\n{self.render()}", view=self
                 )
 
-            # Switch turns to the other player
             self.turn_player = self.opponent if self.turn_player == self.challenger else self.challenger
             self.update_buttons()
             
@@ -96,29 +85,22 @@ class ConnectFourBoardView(discord.ui.View):
         return callback
 
     def check_win(self, piece: str) -> bool:
-        """Scans the board for any 4-in-a-row combos."""
         for r in range(self.rows):
             for c in range(self.cols):
-                # Horizontal
                 if c + 3 < self.cols and all(self.board[r][c+i] == piece for i in range(4)): return True
-                # Vertical
                 if r + 3 < self.rows and all(self.board[r+i][c] == piece for i in range(4)): return True
-                # Diagonal (Down-Right)
                 if r + 3 < self.rows and c + 3 < self.cols and all(self.board[r+i][c+i] == piece for i in range(4)): return True
-                # Diagonal (Up-Right)
                 if r - 3 >= 0 and c + 3 < self.cols and all(self.board[r-i][c+i] == piece for i in range(4)): return True
         return False
 
     async def on_timeout(self):
-        """Locks the board if players take too long."""
         self.update_buttons(disabled=True)
 
 
 class ConnectFourInviteView(discord.ui.View):
-    """Handles the challenge invitation stage before the game starts."""
 
     def __init__(self, challenger: discord.User, opponent: discord.User | None):
-        super().__init__(timeout=60)  # 60 seconds to accept
+        super().__init__(timeout=60)
         self.challenger = challenger
         self.opponent = opponent
         self.accepted = False
@@ -131,16 +113,15 @@ class ConnectFourInviteView(discord.ui.View):
         if self.opponent and interaction.user.id != self.opponent.id:
             return await interaction.response.send_message(f"Only {self.opponent.mention} can accept this invite.", ephemeral=True)
 
-        self.accepted = true_state = True
+        self.accepted = True
         if not self.opponent:
-            self.opponent = interaction.user  # Open challenge claimed!
+            self.opponent = interaction.user
             
         await interaction.response.defer()
         self.stop()
 
 
 class ConnectFourCog(commands.Cog):
-    """Cog housing the /games connectfour command."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -150,7 +131,6 @@ class ConnectFourCog(commands.Cog):
     async def connectfour(self, interaction: discord.Interaction, player: discord.User | None = None):
         await interaction.response.defer()
 
-        # Basic validations
         if player and player.id == interaction.user.id:
             return await interaction.followup.send("You can't play against yourself, silly!", ephemeral=True)
         if player and player.bot:
@@ -163,14 +143,12 @@ class ConnectFourCog(commands.Cog):
             content=f"{target_mention} > Join {interaction.user.mention} in Connect Four!", view=invite_view
         )
 
-        # Wait for someone to accept the invite
         if await invite_view.wait() or not invite_view.accepted:
             invite_view.accept.disabled = True
             return await interaction.followup.edit_message(
                 message_id=msg.id, content=f"{TIMER} **The game invitation has expired.**", view=invite_view
             )
 
-        # Launch the actual game board
         board_view = ConnectFourBoardView(interaction.user, invite_view.opponent)
         await interaction.followup.edit_message(
             message_id=msg.id,
@@ -178,7 +156,6 @@ class ConnectFourCog(commands.Cog):
             view=board_view,
         )
 
-        # Wait for the game to conclude or time out
         if await board_view.wait():
             board_view.update_buttons(disabled=True)
             await interaction.followup.edit_message(
