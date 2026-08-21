@@ -1,7 +1,6 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from groups import games_group
 
 # Standard Unicode Symbols & Emojis
 P1 = "❌"
@@ -173,8 +172,8 @@ class TicTacToeCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @games_group.command(
-        name="tictactoe", description="Play TicTacToe with a friend"
+    @app_commands.command(
+        name="games-tictactoe", description="Play TicTacToe with a friend"
     )
     @app_commands.describe(player="The user you want to play against (optional)")
     @app_commands.allowed_contexts(
