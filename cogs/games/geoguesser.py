@@ -5,7 +5,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from data.flags import FLAGS
-from groups import games_group
 
 
 class GameView(discord.ui.View):
@@ -51,7 +50,7 @@ class FlagGame(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @games_group.command(name="geoguesser", description="Guess the countries by their flags!")
+    @app_commands.command(name="games-geoguesser", description="Guess the countries by their flags!")
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def flag_guesser(self, interaction: discord.Interaction):
         score = 0
