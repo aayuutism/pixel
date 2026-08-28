@@ -15,7 +15,6 @@ intents.message_content = True
 class MyBot(commands.Bot):
 
     async def setup_hook(self):
-
         # Automatically loading every extension/cog inside the cogs folder
         if os.path.exists("cogs"):
             for root, _, files in os.walk("cogs"):
@@ -29,8 +28,7 @@ class MyBot(commands.Bot):
                         except Exception as e:
                             print(f"Oops, failed to load {cog_name}: {e}")
 
-      # Sync command tree with Discord
-      # self.tree.clear_commands(guild=None)
+        # Sync command tree with Discord
         await self.tree.sync()
         print("All slash commands synced with Discord!")
 
@@ -49,7 +47,6 @@ async def on_ready():
 
 
 @bot.tree.error
-
 async def on_app_command_error(interaction: discord.Interaction, error: Exception):
     import traceback
 
