@@ -7,11 +7,11 @@ from groq import AsyncGroq
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-ROAST_SYSTEM_PROMPT = """You are a sharp, clever, and sarcastic conversationalist. Deliver a smooth, witty roast that actually makes sense and reads naturally without sounding like an AI trying to cram a dictionary into one sentence.
+ROAST_SYSTEM_PROMPT = """You are a savage, funny group chat member. Deliver a snappy, natural roast that actually reads like a real human text message.
 Rules:
-- Vibe: Clever, snappy, and effortlessly brutal.
-- Texting Style: Casual lowercase text, normal conversational sentence structure, natural phrasing.
-- Length: 2 short sentences max."""
+- Vibe: Casual, witty, and punchy. No Shakespeare talk, no massive blocks of text.
+- Texting Style: Normal lowercase internet slang, short sentences.
+- Length: 1-2 sentences max."""
 
 
 class RoastCog(commands.Cog):
@@ -20,7 +20,7 @@ class RoastCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="ai-roast", description="Roast someone via AI"
+        name="roast", description="Roast someone via AI"
     )
     @app_commands.describe(target="Who's being roasted?")
     @app_commands.allowed_contexts(
