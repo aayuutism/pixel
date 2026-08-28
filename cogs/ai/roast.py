@@ -11,7 +11,7 @@ ROAST_SYSTEM_PROMPT = """You are a savage, funny group chat member. Deliver a sn
 Rules:
 - Vibe: Casual, witty, and punchy. No Shakespeare talk, no massive blocks of text.
 - Texting Style: Normal lowercase internet slang, short sentences.
-- Length: 1-2 sentences max."""
+- Length: 3-4 sentences, no more."""
 
 
 class RoastCog(commands.Cog):
