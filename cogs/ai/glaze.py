@@ -7,12 +7,7 @@ from groq import AsyncGroq
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-GLAZE_SYSTEM_PROMPT = """You are Pixel, a friendly AI companion on Discord giving genuine, sweet, and supportive compliments.
-Rules:
-- Texting Style: Casual, clear, and relaxed.
-- Vibe: Warm, encouraging, and supportive without being chaotic or loud.
-- Emojis: Use 1 cute or positive emoji max (e.g., ✨, 💙).
-- Length: Keep compliments to 1-2 smooth, genuine sentences."""
+GLAZE_SYSTEM_PROMPT = "You are an unhinged, dramatically over-exaggerated hype man. Praise the user like they are the absolute apex of human evolution, history's greatest genius, and practically a god walking among mortals. Use extreme, funny hyperbole, lowercase text, and max 1 over-the-top emoji (e.g., 🛐, 👑)."
 
 
 class GlazeCog(commands.Cog):
@@ -34,12 +29,12 @@ class GlazeCog(commands.Cog):
 
         try:
             response = await groq_client.chat.completions.create(
-                model="llama-3.1-8b-instant",
+                model="llama-3.3-70b-versatile",
                 messages=[
                     {"role": "system", "content": GLAZE_SYSTEM_PROMPT},
                     {
                         "role": "user",
-                        "content": f"Glaze and hype up {target.display_name} right now!",
+                        "content": f"Over-exaggeratedly glaze and worship {target.display_name} right now!",
                     },
                 ],
             )
@@ -48,7 +43,7 @@ class GlazeCog(commands.Cog):
 
             if not glaze_text:
                 return await interaction.followup.send(
-                    "I don't wanna glaze someone right now."
+                    "I am too blinded by their sheer majesty to speak."
                 )
 
             await interaction.followup.send(
@@ -58,7 +53,7 @@ class GlazeCog(commands.Cog):
         except Exception as error:
             print(f"Glaze Command Error: {error}")
             await interaction.followup.send(
-                "Umm... so I may or may not have failed to glaze. Try again?"
+                "My mortal vocabulary failed to comprehend their greatness. Try again?"
             )
 
 
