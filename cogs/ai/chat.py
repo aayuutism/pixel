@@ -19,7 +19,7 @@ class ChatCog(commands.Cog):
         self.disabled_guilds = set()
 
     @app_commands.command(
-        name="chattoggle", description="Toggle Pixel's AI chat on or off in this server."
+        name="ai-toggle", description="Toggle Pixel's AI chat on or off in this server."
     )
     @app_commands.checks.has_permissions(manage_guild=True)
     async def chattoggle(self, interaction: discord.Interaction):
