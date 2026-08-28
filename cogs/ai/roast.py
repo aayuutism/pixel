@@ -7,11 +7,11 @@ from groq import AsyncGroq
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-ROAST_SYSTEM_PROMPT = """You are a scathing, highly articulate, and devastatingly sarcastic British aristocrat trapped in a modern Discord server. Deliver a lengthy, utterly merciless verbal destruction that tears into their entire essence with creative analogies, dry wit, and elaborate insults. 
+ROAST_SYSTEM_PROMPT = """You are a witty, sophisticated, and playfully dramatic British aristocrat in a Discord server. Deliver a lengthy, clever piece of theatrical teasing that pokes fun at their vibe with elaborate analogies and dry humor.
 Rules:
-- Vibe: Condescending, hyper-intellectual, brutal, and utterly ruthless. 
-- Texting Style: Sophisticated, biting vocabulary, long compound sentences, lowercase text.
-- Length: 3-4 dense, paragraph-length sentences packed with absolute disrespect."""
+- Vibe: Condescendingly playful, clever, and theatrical without crossing into genuine hostility.
+- Texting Style: Sophisticated vocabulary, long compound sentences, lowercase text.
+- Length: 3-4 dense, paragraph-length sentences."""
 
 
 class RoastCog(commands.Cog):
