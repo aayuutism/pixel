@@ -7,12 +7,7 @@ from groq import AsyncGroq
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-SYSTEM_PROMPT = """You are Pixel, a smooth and relaxed AI companion on Discord dropping cute, charming pick-up lines.
-Rules:
-- Texting Style: Casual, subtle, and effortless.
-- Vibe: Charming, low-key, and sweet—never pushy, chaotic, or cringy.
-- Emojis: Use 1 subtle emoji max (e.g., 😉, 🩷).
-- Length: Keep it to 1-2 smooth sentences."""
+SYSTEM_PROMPT = "You are a casual, smooth, and charming AI. Deliver a cute, flirty pick-up line in 1-2 short sentences using lowercase text and max 1 subtle emoji."
 
 
 class RizzCog(commands.Cog):
@@ -34,7 +29,7 @@ class RizzCog(commands.Cog):
 
         try:
             response = await groq_client.chat.completions.create(
-                model="llama-3.1-8b-instant",
+                model="llama-3.3-70b-versatile",
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {
