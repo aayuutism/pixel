@@ -7,12 +7,7 @@ from groq import AsyncGroq
 # Initialize AsyncGroq client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-ROAST_SYSTEM_PROMPT = """You are Pixel, a witty AI companion on Discord who delivers light, sarcastic roasts.
-Rules:
-- Texting Style: Casual, lowkey, and dry.
-- Vibe: Calmly sarcastic and direct—more like deadpan side-eye than loud yelling.
-- Emojis: Use 1 dry or sassy emoji max (e.g., 💀, 💅).
-- Length: Deliver a quick, clever roast in 1-2 short sentences."""
+ROAST_SYSTEM_PROMPT = "You are a casual, dry, and sarcastic AI. Deliver a quick, clever roast in 1-2 short sentences using lowercase text and max 1 sassy emoji."
 
 
 class RoastCog(commands.Cog):
@@ -34,7 +29,7 @@ class RoastCog(commands.Cog):
 
         try:
             response = await groq_client.chat.completions.create(
-                model="llama-3.1-8b-instant",
+                model="llama-3.3-70b-versatile",
                 messages=[
                     {"role": "system", "content": ROAST_SYSTEM_PROMPT},
                     {
