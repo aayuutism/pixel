@@ -77,6 +77,9 @@ class ChatCog(commands.Cog):
                 # Fetch recent messages for conversation context (memory)
                 messages_context = []
                 async for msg in message.channel.history(limit=10, oldest_first=True):
+                    if not msg.content:
+                        continue
+                    
                     # Clean out bot mention tags from text
                     clean_content = re.sub(f"<@!?{self.bot.user.id}>", "", msg.content).strip()
                     if not clean_content:
@@ -94,9 +97,9 @@ class ChatCog(commands.Cog):
                 # Build final payload
                 payload = [{"role": "system", "content": SYSTEM_PROMPT}] + messages_context
 
-                # Send request to Groq API
+                # Send request to Groq API using the stable versatile model
                 response = await groq_client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
+                    model="llama-3.3-70b-versatile",
                     messages=payload,
                 )
 
