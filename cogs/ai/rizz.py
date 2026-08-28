@@ -16,7 +16,7 @@ class RizzCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="ai-rizz", description="Rizz someone up via AI :3"
+        name="rizz", description="Rizz someone up via AI :3"
     )
     @app_commands.describe(target="Who are we rizzing up?")
     @app_commands.allowed_contexts(
