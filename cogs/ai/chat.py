@@ -99,7 +99,7 @@ class ChatCog(commands.Cog):
 
                 # Send request to Groq API using the stable versatile model
                 response = await groq_client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
+                    model="llama-3.1-8b-instant",
                     messages=payload,
                 )
 
