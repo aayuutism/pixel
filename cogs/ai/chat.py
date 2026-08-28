@@ -1,23 +1,54 @@
 import os
 import re
 import discord
+from discord import app_commands
 from discord.ext import commands
 from groq import AsyncGroq
 
 # Initialize Async Groq Client
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-SYSTEM_PROMPT =  "You are Pixel, a casual, friendly, and concise Discord AI companion. Keep your responses to 1-2 short sentences using lowercase text and a warm, playful tone."
+SYSTEM_PROMPT = "You are Pixel, a casual, friendly, and concise Discord AI companion. Keep your responses to 1-2 short sentences using lowercase text and a warm, playful tone."
+
 
 class ChatCog(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        # Track disabled guilds by their ID
+        self.disabled_guilds = set()
+
+    @app_commands.command(
+        name="chattoggle", description="Toggle Pixel's AI chat on or off in this server."
+    )
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def chattoggle(self, interaction: discord.Interaction):
+        if not interaction.guild:
+            return await interaction.response.send_message(
+                "This command can only be used in a server!", ephemeral=True
+            )
+
+        guild_id = interaction.guild_id
+
+        if guild_id in self.disabled_guilds:
+            self.disabled_guilds.remove(guild_id)
+            await interaction.response.send_message(
+                "✨ AI chat has been **enabled** in this server!", ephemeral=True
+            )
+        else:
+            self.disabled_guilds.add(guild_id)
+            await interaction.response.send_message(
+                "🔕 AI chat has been **disabled** in this server.", ephemeral=True
+            )
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         # Ignore messages from bots (including herself)
         if message.author.bot:
+            return
+
+        # Check if chat is toggled off in this server (ignore for DMs)
+        if message.guild and message.guild.id in self.disabled_guilds:
             return
 
         # Check if the bot is mentioned
