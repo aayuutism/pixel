@@ -9,7 +9,7 @@ PLAYER2 = "<:c4_p2:1543297268633837628>"
 TICK = "<:check:1533886268512141393>"
 TADA = "<:tada:1536797799138721812>"
 TIMER = "<:timer:1536795548961480806>"
-NUMBERS = ["<:c4_n1:1543297289487917096>", "<:c4_n2:1543297291736191056>", "<:c4_n3:1543297294240325663>", "<:c4_n4:1543297296643526796>", "<:c4_n5:1543297299160236042>", "<:c4_n6:1543297301370372127>", "<:c4_n7:1543297303563997354>"]
+NUMBERS = ["` 1 `", "` 2 `", "` 3 `", "` 4 `", "` 5 `", "` 6 `", "` 7 `"]
 
 
 class ConnectFourBoardView(discord.ui.View):
@@ -28,7 +28,7 @@ class ConnectFourBoardView(discord.ui.View):
 
     def render(self) -> str:
         grid_text = "\n".join("".join(row) for row in self.board)
-        return f"{grid_text}\n{NUMBERS}"
+        return f"{grid_text}\n{''.join(NUMBERS)}"
 
     def update_buttons(self, disabled: bool = False):
         self.clear_items()
