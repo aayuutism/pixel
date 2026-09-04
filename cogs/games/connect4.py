@@ -6,7 +6,7 @@ from discord.ext import commands
 PLAYER0 = "<:c4_null:1543297252800467020>"
 PLAYER1 = "<:c4_p1:1543297255526891570>"
 PLAYER2 = "<:c4_p2:1543297268633837628>"
-TICK = "✔"
+TICK = "<:check:1533886268512141393>"
 TADA = "<:tada:1536797799138721812>"
 TIMER = "<:timer:1536795548961480806>"
 NUMBERS = [
@@ -38,12 +38,12 @@ class ConnectFourBoardView(discord.ui.View):
         grid_text = "\n".join("".join(row) for row in self.board)
         return f"{grid_text}\n{''.join(NUMBERS)}"
 
-    def get_embed(self, status_text: str, color: discord.Color = discord.Color.blurple()) -> discord.Embed:
+    def get_embed(self, status_text: str) -> discord.Embed:
         description = f"{self.render()}\n\n{status_text}"
         return discord.Embed(
             title=f"Connect Four: {self.challenger.display_name} vs {self.opponent.display_name}",
             description=description,
-            color=color
+            color=discord.Color(0x131416)
         )
 
     def update_buttons(self, disabled: bool = False):
@@ -77,19 +77,13 @@ class ConnectFourBoardView(discord.ui.View):
             if self.check_win(current_symbol):
                 self.update_buttons(disabled=True)
                 self.stop()
-                win_embed = self.get_embed(
-                    f"{TADA} {self.turn_player.mention} ({current_symbol}) won Connect Four!",
-                    color=discord.Color.green()
-                )
+                win_embed = self.get_embed(f"{TADA} {self.turn_player.mention} ({current_symbol}) won Connect Four!")
                 return await interaction.response.edit_message(embed=win_embed, view=self)
 
             if all(cell != PLAYER0 for cell in self.board[0]):
                 self.update_buttons(disabled=True)
                 self.stop()
-                tie_embed = self.get_embed(
-                    "Aw, ggs! It's a tie!",
-                    color=discord.Color.gold()
-                )
+                tie_embed = self.get_embed("Aw, ggs! It's a tie!")
                 return await interaction.response.edit_message(embed=tie_embed, view=self)
 
             self.turn_player = self.opponent if self.turn_player == self.challenger else self.challenger
@@ -134,6 +128,8 @@ class ConnectFourInviteView(discord.ui.View):
         if not self.opponent:
             self.opponent = interaction.user
             
+        for child in self.children:
+            child.disabled = True
         await interaction.response.defer()
         self.stop()
 
@@ -158,18 +154,19 @@ class ConnectFourCog(commands.Cog):
         
         invite_embed = discord.Embed(
             title="Connect Four Invitation",
-            description=f"Click the button to join {interaction.user.mention} in Connect Four!\nWaiting for: {target_mention}",
-            discord.Color.from_str("#131416")
+            description=f"Join {interaction.user.mention} in Connect Four!\nWaiting for: {target_mention}",
+            color=discord.Color(0x131416)
         )
         
         msg = await interaction.followup.send(embed=invite_embed, view=invite_view)
 
         if await invite_view.wait() or not invite_view.accepted:
-            invite_view.accept.disabled = True
+            for child in invite_view.children:
+                child.disabled = True
             timeout_embed = discord.Embed(
                 title="Connect Four Invitation",
                 description=f"{TIMER} **Aw, the invitation timed out.**",
-                color=discord.Color.red()
+                color=discord.Color(0x131416)
             )
             return await interaction.followup.edit_message(
                 message_id=msg.id, embed=timeout_embed, view=invite_view
@@ -186,10 +183,7 @@ class ConnectFourCog(commands.Cog):
 
         if await board_view.wait():
             board_view.update_buttons(disabled=True)
-            timeout_game_embed = board_view.get_embed(
-                f"{TIMER} Aw, the game timed out due to inactivity.",
-                color=discord.Color.red()
-            )
+            timeout_game_embed = board_view.get_embed(f"{TIMER} Aw, the game timed out due to inactivity.")
             await interaction.followup.edit_message(
                 message_id=msg.id, embed=timeout_game_embed, view=board_view
             )
