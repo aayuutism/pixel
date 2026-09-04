@@ -9,7 +9,7 @@ class AvatarCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="user-avatar", description="Shows the avatar of a member."
+        name="avatar", description="Shows the avatar of a member."
     )
     @app_commands.describe(
         target="The user whose avatar you want to see (optional)",
