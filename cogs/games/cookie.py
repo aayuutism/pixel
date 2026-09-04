@@ -120,7 +120,6 @@ class CookieCog(commands.Cog):
 
         view = CookieGameView(interaction.user, player)
         game_embed = discord.Embed(
-            title="Cookie Clicker",
             description=f"**Click the cookie!** {COOKIE}",
             color=discord.Color(0x131416)
         )
