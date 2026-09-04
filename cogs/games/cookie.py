@@ -35,7 +35,7 @@ class CookieCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="games-cookie", description="Test your reflexes and click the cookie first!")
+    @app_commands.command(name="cookie", description="Click the cookie first!")
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def cookie(self, interaction: discord.Interaction):
         start_embed = discord.Embed(
