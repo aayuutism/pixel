@@ -9,7 +9,7 @@ class BannerCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="user-banner", description="Shows the user banner of a member."
+        name="banner", description="Shows the user banner of a member."
     )
     @app_commands.describe(
         target="The user whose banner you want to see (optional)",
