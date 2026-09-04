@@ -76,7 +76,7 @@ class CookieCog(commands.Cog):
 
             invite_view = CookieInviteView(interaction.user, player)
             invite_embed = discord.Embed(
-                title="Snatch that cookie",
+            title="Click the cookie!",
                 description=f"Click the cookie first and take the win! {COOKIE}",
                 color=discord.Color(0x131416)
             )
@@ -95,14 +95,14 @@ class CookieCog(commands.Cog):
                 return await interaction.edit_original_response(embed=timeout_embed, view=invite_view)
 
             start_embed = discord.Embed(
-                title="Cookie Clicker",
+                title="Click the cookie!",
                 description=f"Get ready, {interaction.user.mention} vs {player.mention}... The cookie is coming! {COOKIE}",
                 color=discord.Color(0x131416)
             )
             await interaction.edit_original_response(embed=start_embed, view=None)
         else:
             start_embed = discord.Embed(
-                title="Cookie Clicker",
+                title="Click the cookie!",
                 description=f"Get ready... The cookie is coming! {COOKIE}",
                 color=discord.Color(0x131416)
             )
@@ -112,7 +112,7 @@ class CookieCog(commands.Cog):
         for countdown in range(delay, 0, -1):
             await asyncio.sleep(1)
             countdown_embed = discord.Embed(
-                title="Cookie Clicker",
+                title="Click the cookie!",
                 description=f"Snatch the cookie in... **{countdown}** {COOKIE}",
                 color=discord.Color(0x131416)
             )
