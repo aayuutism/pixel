@@ -1,4 +1,5 @@
 import asyncio
+import random
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -23,16 +24,22 @@ NUMBERS = [
 
 class ConnectFourBoardView(discord.ui.View):
 
-    def __init__(self, challenger: discord.User, opponent: discord.User):
+    def __init__(self, challenger: discord.User, opponent: discord.User, first_turn: str = "challenger"):
         super().__init__(timeout=300)
         self.challenger = challenger
         self.opponent = opponent
-        self.turn_player = challenger
         
         self.rows, self.cols = 6, 7
         self.board = [[PLAYER0 for _ in range(self.cols)] for _ in range(self.rows)]
         self.symbols = {challenger.id: PLAYER1, opponent.id: PLAYER2}
         
+        if first_turn == "opponent":
+            self.turn_player = opponent
+        elif first_turn == "random":
+            self.turn_player = random.choice([challenger, opponent])
+        else:
+            self.turn_player = challenger
+            
         self.update_buttons()
 
     def render(self) -> str:
@@ -135,8 +142,16 @@ class ConnectFourCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="connect4", description="Play Connect Four with a friend")
-    @app_commands.describe(player="Pick who you wanna play against!")
-    async def connectfour(self, interaction: discord.Interaction, player: discord.User | None = None):
+    @app_commands.describe(
+        player="Pick who you wanna play against!",
+        first_turn="Choose who takes the first turn"
+    )
+    @app_commands.choices(first_turn=[
+        app_commands.Choice(name="Challenger (You)", value="challenger"),
+        app_commands.Choice(name="Opponent", value="opponent"),
+        app_commands.Choice(name="Random", value="random")
+    ])
+    async def connectfour(self, interaction: discord.Interaction, player: discord.User | None = None, first_turn: str = "challenger"):
         await interaction.response.defer()
 
         if player and player.id == interaction.user.id:
@@ -157,10 +172,12 @@ class ConnectFourCog(commands.Cog):
                 message_id=msg.id, content=f"{TIMER} **Aw, the invitation timed out.**", view=invite_view
             )
 
-        board_view = ConnectFourBoardView(interaction.user, invite_view.opponent)
+        board_view = ConnectFourBoardView(interaction.user, invite_view.opponent, first_turn=first_turn)
+        first_symbol = board_view.symbols[board_view.turn_player.id]
+        
         await interaction.followup.edit_message(
             message_id=msg.id,
-            content=f"{PLAYER1} **Connect Four**: {interaction.user.mention} vs {invite_view.opponent.mention}\n\n{board_view.render()}\n\n{PLAYER1} {interaction.user.mention}, it's your turn!",
+            content=f"{PLAYER1} **Connect Four**: {interaction.user.mention} vs {invite_view.opponent.mention}\n\n{board_view.render()}\n\n{first_symbol} {board_view.turn_player.mention}, it's your turn!",
             view=board_view,
         )
 
