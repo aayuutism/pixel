@@ -104,7 +104,7 @@ class ConnectFourInviteView(discord.ui.View):
         self.opponent = opponent
         self.accepted = False
 
-    @discord.ui.button(emoji=TICK_MARK, style=discord.ButtonStyle.success)
+    @discord.ui.button(emoji=TICK, style=discord.ButtonStyle.success)
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id == self.challenger.id:
             return await interaction.response.send_message("Newsflash, you can't play against yourself.", ephemeral=True)
