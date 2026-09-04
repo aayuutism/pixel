@@ -28,12 +28,12 @@ class MyBot(commands.Bot):
                         except Exception as e:
                             print(f"Oops, failed to load {cog_name}: {e}")
 
-        # Sync command tree with Discord
+        # Sync command tree with Discord on boot
         await self.tree.sync()
         print("All slash commands synced with Discord!")
 
 
-bot = MyBot(command_prefix="?", intents=intents)
+bot = MyBot(command_prefix="!", intents=intents)
 
 
 @bot.event
@@ -44,6 +44,18 @@ async def on_ready():
     )
     await bot.change_presence(status=discord.Status.online, activity=activity)
     print(f"We're logged in as {bot.user} and ready to go!")
+
+
+@bot.command(name="sync")
+@commands.is_owner()
+async def sync_commands(ctx):
+    """Manually syncs slash commands and handles success or failure feedback."""
+    async with ctx.typing():
+        try:
+            synced = await bot.tree.sync()
+            await ctx.send(f"Successfully synced {len(synced)} slash command(s)!")
+        except Exception as e:
+            await ctx.send(f"Failed to sync slash commands: `{e}`")
 
 
 @bot.tree.error
